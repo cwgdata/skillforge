@@ -228,7 +228,7 @@ async function loadCoverage() {
       `</td>` +
       `<td>` +
       (on
-        ? `<label class="switch" title="Mine this feed on Refresh"><input type="checkbox" data-table="${esc(e.inference_table)}" ${enabled ? "checked" : ""}/><span class="slider"></span></label>`
+        ? `<label class="switch" title="Mine this feed on Refresh"><input type="checkbox" aria-label="Mine ${esc(e.inference_table)}" data-table="${esc(e.inference_table)}" ${enabled ? "checked" : ""}/><span class="slider"></span></label>`
         : `<span class="muted-txt">—</span>`) +
       `</td>`;
     tb.appendChild(tr);
@@ -708,8 +708,12 @@ function renderBenchParams(res) {
   const grid = el("div", "params-grid");
   s.parameters.forEach((p) => {
     const box = el("div");
-    box.innerHTML = `<label>${esc(p.name)} <span style="color:var(--muted2);font-weight:400">— ${esc(p.description)}</span></label>`;
+    const inputId = "bench-param-" + String(p.name).replace(/[^a-zA-Z0-9_-]/g, "-");
+    box.innerHTML = `<label for="${inputId}">${esc(p.name)} <span style="color:var(--muted2);font-weight:400">— ${esc(p.description)}</span></label>`;
     const inp = el("input");
+    inp.id = inputId;
+    inp.name = inputId;
+    inp.setAttribute("aria-label", p.name);
     inp.dataset.param = p.name;
     inp.placeholder = p.description || p.name;
     box.appendChild(inp);
