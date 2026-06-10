@@ -28,6 +28,7 @@
       <nav class="side-nav" id="sideNav">
         <a href="#sec-overview" class="nav-item active">Overview</a>
         <a href="#sec-cost" class="nav-item">Cost &amp; ROI</a>
+        <a href="#sec-history" class="nav-item" id="navHistory" hidden>Mining Trend</a>
         <a href="#sec-patterns" class="nav-item">Patterns</a>
         <a href="#sec-skills" class="nav-item">Skills</a>
         <a href="#sec-coverage" class="nav-item">Gateway Coverage</a>
@@ -127,15 +128,17 @@
         <h2>Cost &amp; ROI <span class="source-pill" id="costNote" hidden></span></h2>
         <div class="cost-head">
           <div class="cost-kpis" id="costKpis"></div>
-          <div class="price-ctl">
-            <label for="priceInput">$ / 1M input tokens</label>
-            <input id="priceInput" type="number" step="0.25" min="0" value="2.50" />
-            <span class="hint">illustrative — use your DBU rate</span>
-          </div>
-          <div class="price-ctl">
-            <label for="scaleInput">× org projection</label>
-            <input id="scaleInput" type="number" step="1" min="1" value="1" />
-            <span class="hint">sample → full traffic</span>
+          <div class="cost-inputs">
+            <div class="price-ctl">
+              <label for="priceInput">$ / 1M input tokens</label>
+              <input id="priceInput" type="number" step="0.25" min="0" value="2.50" />
+              <span class="hint">illustrative — use your DBU rate</span>
+            </div>
+            <div class="price-ctl">
+              <label for="scaleInput">× org projection</label>
+              <input id="scaleInput" type="number" step="1" min="1" value="1" />
+              <span class="hint">sample → full traffic</span>
+            </div>
           </div>
         </div>
         <div class="card">

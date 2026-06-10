@@ -544,15 +544,26 @@ function renderSkills(res) {
       .join("");
 
     const hasAb = !!s.quality_ab;
+    // Secondary, low-emphasis: quality A/B
     const abBtn = hasAb
-      ? `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Re-run A/B</button>`
-      : `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Run quality A/B</button>`;
+      ? `<button class="subtle-btn ab-btn" data-skill="${esc(s.id)}">Re-run A/B</button>`
+      : `<button class="subtle-btn ab-btn" data-skill="${esc(s.id)}">Run quality A/B</button>`;
     const pub = PUBLISHED[s.id];
-    const pubBtn = `<button class="ghost-btn pub-btn" data-skill="${esc(s.id)}">${pub ? "Re-publish" : "Publish to Genie Code"}</button>`;
-    const pubChip = pub ? `<span class="badge published" title="${esc(pub.path || "")}">✓ published v${pub.version}</span>` : "";
+    // ONE primary action: Publish / Re-publish (filled blue, success-tinted once published)
+    const pubBtn = `<button class="primary-btn pub-btn${pub ? " published-state" : ""}" data-skill="${esc(s.id)}">${pub ? "Re-publish" : "Publish to Genie Code"}</button>`;
+    const pubChip = pub ? `<span class="badge published" title="${esc(pub.path || "")}">✓ published v${esc(pub.version)}</span>` : "";
     const adp = ADOPTION[s.id];
-    const adpChip = adp ? `<span class="badge adoption" title="${adp.adopted}/${adp.matches} matching prompts use the template">${adp.pct}% adopted</span>` : "";
-    const adpBtn = pub ? `<button class="ghost-btn adp-btn" data-skill="${esc(s.id)}">${adp ? "Re-measure adoption" : "Measure adoption"}</button>` : "";
+    const adpChip = adp ? `<span class="badge adoption" title="${esc(adp.adopted)}/${esc(adp.matches)} matching prompts use the template">${esc(adp.pct)}% adopted</span>` : "";
+    // Secondary (bordered): measure adoption — only meaningful once published
+    const adpBtn = pub ? `<button class="ghost-btn adp-btn" data-skill="${esc(s.id)}">${adp ? "Re-measure" : "Measure adoption"}</button>` : "";
+    // Overflow Export menu (combines .md + .json)
+    const exportMenu =
+      `<div class="menu-wrap">` +
+      `<button class="ghost-btn export-toggle" data-skill="${esc(s.id)}" aria-haspopup="true" aria-expanded="false">Export ▾</button>` +
+      `<div class="menu-pop" hidden>` +
+      `<button data-export="${esc(s.id)}" data-fmt="markdown">Export .md</button>` +
+      `<button data-export="${esc(s.id)}" data-fmt="json">Export .json</button>` +
+      `</div></div>`;
 
     card.innerHTML =
       `<div class="top">
@@ -581,17 +592,32 @@ function renderSkills(res) {
          ${pubBtn}
          ${adpBtn}
          ${abBtn}
-         <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="markdown">Export .md</button>
-         <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="json">.json</button>
+         <span class="spacer"></span>
+         ${exportMenu}
        </div>`;
     grid.appendChild(card);
   });
 
-  // wire export (download) + quality A/B buttons
+  // wire export overflow menu (toggle)
+  grid.querySelectorAll(".export-toggle").forEach((t) => {
+    t.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const pop = t.parentElement.querySelector(".menu-pop");
+      const open = pop && pop.hidden;
+      // close any other open menus first
+      grid.querySelectorAll(".menu-pop").forEach((p) => { p.hidden = true; });
+      grid.querySelectorAll(".export-toggle").forEach((b) => b.setAttribute("aria-expanded", "false"));
+      if (pop) { pop.hidden = !open; t.setAttribute("aria-expanded", open ? "true" : "false"); }
+    });
+  });
+  // wire export (download) menu items
   grid.querySelectorAll("[data-export]").forEach((b) => {
-    b.addEventListener("click", () => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
       const id = b.dataset.export;
       const fmt = b.dataset.fmt || "markdown";
+      const pop = b.closest(".menu-pop");
+      if (pop) pop.hidden = true;
       location.href = `/api/skills/${encodeURIComponent(id)}/export?format=${fmt}`;
     });
   });
@@ -637,8 +663,14 @@ async function loadHistory() {
   try { d = await (await fetch("/api/history")).json(); } catch (e) { return; }
   const runs = (d.runs || []);
   const sec = $("#sec-history");
-  if (runs.length < 2) { if (sec) sec.hidden = true; return; }  // need ≥2 points to trend
+  const nav = $("#navHistory");
+  if (runs.length < 2) {
+    if (sec) sec.hidden = true;
+    if (nav) nav.hidden = true;
+    return;
+  }  // need ≥2 points to trend
   if (sec) sec.hidden = false;
+  if (nav) nav.hidden = false;
   const note = $("#historyNote");
   if (note) { note.hidden = false; note.textContent = runs.length + " runs"; }
   const labels = runs.map((r) => (r.at || "").slice(5, 16));
@@ -648,11 +680,11 @@ async function loadHistory() {
   historyChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets: [
-      { label: "Patterns", data: runs.map((r) => r.patterns), borderColor: "#FF3620", tension: 0.3 },
-      { label: "Skills", data: runs.map((r) => r.skills), borderColor: "#00B378", tension: 0.3 },
+      { label: "Patterns", data: runs.map((r) => r.patterns), borderColor: "#2272B4", backgroundColor: "rgba(34,114,180,0.10)", tension: 0.3 },
+      { label: "Skills", data: runs.map((r) => r.skills), borderColor: "#00A972", backgroundColor: "rgba(0,169,114,0.10)", tension: 0.3 },
     ]},
-    options: { plugins: { legend: { labels: { color: "#9eb7be" } } },
-      scales: { x: { ticks: { color: "#9eb7be" } }, y: { ticks: { color: "#9eb7be" }, beginAtZero: true } } },
+    options: { plugins: { legend: { labels: { color: "#5A6872" } } },
+      scales: { x: { grid: { color: "rgba(17,23,28,0.06)" }, ticks: { color: "#5A6872" } }, y: { grid: { color: "rgba(17,23,28,0.06)" }, ticks: { color: "#5A6872" }, beginAtZero: true } } },
   });
 }
 
@@ -777,8 +809,8 @@ async function reloadCharts() {
   if (CHART_DAY) { CHART_DAY.destroy(); CHART_DAY = null; }
   if (CHART_EP) { CHART_EP.destroy(); CHART_EP = null; }
 
-  const tealGrid = "rgba(255,255,255,0.07)";
-  const tickColor = "#93a8ad";
+  const gridColor = "rgba(17,23,28,0.06)";
+  const tickColor = "#5A6872";
 
   // prompts per day — line
   const days = stats.prompts_per_day || [];
@@ -788,8 +820,8 @@ async function reloadCharts() {
       labels: days.map((d) => d.date),
       datasets: [{
         data: days.map((d) => d.count),
-        borderColor: "#ff3621",
-        backgroundColor: "rgba(255,54,33,0.15)",
+        borderColor: "#2272B4",
+        backgroundColor: "rgba(34,114,180,0.10)",
         fill: true,
         tension: 0.35,
         pointRadius: 0,
@@ -800,15 +832,15 @@ async function reloadCharts() {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: tealGrid }, ticks: { color: tickColor, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
-        y: { grid: { color: tealGrid }, ticks: { color: tickColor }, beginAtZero: true },
+        x: { grid: { color: gridColor }, ticks: { color: tickColor, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor }, beginAtZero: true },
       },
     },
   });
 
   // tokens by endpoint — doughnut
   const eps = stats.tokens_by_endpoint || [];
-  const palette = ["#ff3621", "#00b378", "#ffab00", "#4aa3df", "#9b8cff", "#ff7aa0", "#6e858b"];
+  const palette = ["#2272B4", "#00A972", "#DE7C00", "#7C6BD6", "#FF3621", "#4AA3DF", "#8C99A3"];
   CHART_EP = new Chart($("#chartEndpoint"), {
     type: "doughnut",
     data: {
@@ -816,7 +848,7 @@ async function reloadCharts() {
       datasets: [{
         data: eps.map((e) => e.tokens),
         backgroundColor: palette,
-        borderColor: "rgba(0,0,0,0.25)",
+        borderColor: "#FFFFFF",
         borderWidth: 2,
       }],
     },
@@ -1043,6 +1075,18 @@ function wireSidebar() {
   document.querySelectorAll("section.section[id]").forEach((s) => obs.observe(s));
 }
 document.addEventListener("DOMContentLoaded", wireSidebar);
+
+// close any open skill-card Export menus when clicking elsewhere / pressing Esc
+document.addEventListener("click", () => {
+  document.querySelectorAll(".menu-pop").forEach((p) => { p.hidden = true; });
+  document.querySelectorAll(".export-toggle").forEach((b) => b.setAttribute("aria-expanded", "false"));
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".menu-pop").forEach((p) => { p.hidden = true; });
+    document.querySelectorAll(".export-toggle").forEach((b) => b.setAttribute("aria-expanded", "false"));
+  }
+});
 
 
 // ---- clear injected-prompt history (destructive, warned) ----
