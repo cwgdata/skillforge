@@ -2358,5 +2358,2505 @@
   "input_tokens": 139,
   "output_tokens": 293,
   "latent_pattern": "noise"
+ },
+ {
+  "request_id": "9c431bc2-56fe-4449-bd0d-e0fa958eec09",
+  "event_time": "2026-06-10 03:02:24",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "can u break down this regex for me? its from our log ingestion pipeline and i need to understand it before modifying: (?P<ip>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).*?(?P<method>GET|POST|PUT|DELETE)",
+  "input_tokens": 433,
+  "output_tokens": 697,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "4a348074-7a1e-455f-8b7f-a42a548c3b6e",
+  "event_time": "2026-06-09 23:18:42",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Someone wants to cancel and get a refund. They're not angry, just disappointed. Write something that's genuinely helpful and understanding.",
+  "input_tokens": 350,
+  "output_tokens": 535,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "18f44e06-4d63-4d5f-9d11-9ed04c0cd523",
+  "event_time": "2026-06-09 02:22:28",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Customer submitted a GDPR request but didn't provide enough info to verify their identity. Draft a follow-up asking for clarification without being creepy about it.",
+  "input_tokens": 399,
+  "output_tokens": 235,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "fe1722f4-8ea3-41b2-82f1-c9ebdfe089ff",
+  "event_time": "2026-06-09 01:54:44",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Summarize this meeting transcript into decisions made and next steps. <transcript>",
+  "input_tokens": 112,
+  "output_tokens": 690,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "ecd10e7f-4434-422b-b37f-de0e19200ea3",
+  "event_time": "2026-06-07 19:52:58",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "GDPR request deadline is in 3 days and I'm stuck on one system\u2014our legacy CRM won't export data cleanly. What should I do? Can I provide partial data with an explanation?",
+  "input_tokens": 207,
+  "output_tokens": 212,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "576f2481-9fe1-4df2-93d2-9fc62b8a18eb",
+  "event_time": "2026-06-10 12:26:08",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you write a query that calculates monthly churn rate? Churn = no orders in 90 days after signup. <ticket text: need this for board meeting>",
+  "input_tokens": 408,
+  "output_tokens": 620,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "5d59e393-5fec-446f-a961-bd3ac03a1ec5",
+  "event_time": "2026-06-08 22:22:48",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Deletion request from California resident. They're invoking CCPA. We have 45 days. Walk me through our verification process to make sure it's actually them requesting.",
+  "input_tokens": 128,
+  "output_tokens": 643,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "006ea690-53dc-4ebb-82bd-eef5402561f2",
+  "event_time": "2026-06-07 05:28:59",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Write a query for the number of new customers acquired each month, filtered to only active customers (not churned).",
+  "input_tokens": 175,
+  "output_tokens": 417,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "bb1a554b-9492-4ea2-a928-405e5d127f69",
+  "event_time": "2026-06-08 16:25:21",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I have a GDPR access request from a user in Germany. They want all their data within 30 days. Can you help me draft a response acknowledging receipt and outlining our process? Here's the ticket: <ticket_text>",
+  "input_tokens": 359,
+  "output_tokens": 667,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "2f73e23a-6dfd-4927-af14-6c4d365191bb",
+  "event_time": "2026-06-09 05:29:01",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "need help converting this perl regex to python flavor. it's supposed to match email addresses but i keep getting different results. pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/",
+  "input_tokens": 146,
+  "output_tokens": 260,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "2f995c2d-daf8-40d2-a5ab-94b1651af685",
+  "event_time": "2026-06-08 10:53:18",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Need a query: customers who churned in the last 90 days, their final order value, and how long they were active.",
+  "input_tokens": 242,
+  "output_tokens": 653,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "5ad74027-768a-4c58-84fc-baf7ed28df98",
+  "event_time": "2026-06-08 18:31:10",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "This CCPA request is tricky\u2014customer is asking for all data shared with 3rd parties. I have notes on our data-sharing agreements here: <notes>. How do I compile this accurately?",
+  "input_tokens": 428,
+  "output_tokens": 815,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "a71dd3e3-c309-4abc-afa2-d2d767d9be87",
+  "event_time": "2026-06-10 08:32:42",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "can u help me write a grok pattern for our nginx access logs? need to extract client_ip, request_method, uri_path, status_code, and response_time_ms. here's a sample line: <sample_log_line>",
+  "input_tokens": 336,
+  "output_tokens": 757,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "e33bc1b1-17b6-41bb-830d-064226f8828f",
+  "event_time": "2026-06-10 03:38:42",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Refund request from someone who used the service for 2 months then wants money back. Draft something that's firm but not rude. <notes>",
+  "input_tokens": 414,
+  "output_tokens": 495,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "de482595-054f-4d8f-8d8f-e30a7c1065e1",
+  "event_time": "2026-06-08 12:49:01",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "CPRA request: customer wants to know if we've profiled them or made automated decisions about them. How do I search our systems for this info and what should I disclose?",
+  "input_tokens": 269,
+  "output_tokens": 203,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "63759c1f-c3d8-4ab7-9f1b-d5226efe2ded",
+  "event_time": "2026-06-09 01:25:40",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Could you review this Python PR summary for the team? Changes, risks, test coverage - all in one. <diff>",
+  "input_tokens": 192,
+  "output_tokens": 411,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "782888fa-97e6-4234-b6e0-949588c4f50c",
+  "event_time": "2026-06-10 13:34:07",
+  "user_email": "hana.sato@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you help me draft a response to this GDPR access request? Customer is asking for all personal data we hold. Here's the ticket: <ticket text>. Need it in 2 days.",
+  "input_tokens": 327,
+  "output_tokens": 528,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "5fbe38c0-b2e3-4d55-9fbc-74e4b88c13fb",
+  "event_time": "2026-06-10 13:05:11",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Please write up the root cause analysis. Bad regex in the new filtering code caused CPU to spike to 95%. <code_diff_and_metrics>",
+  "input_tokens": 359,
+  "output_tokens": 276,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "f692459c-1822-48a2-b4a5-2344768c7fc8",
+  "event_time": "2026-06-07 02:27:13",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "triage request: <ticket text> severity level + is it a known issue?",
+  "input_tokens": 201,
+  "output_tokens": 493,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "b24e7f7f-5f2f-4915-a0a3-9f647329ffc4",
+  "event_time": "2026-06-07 16:03:27",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Deletion request received. Customer says they're exercising right-to-be-forgotten. Need to verify we actually purged everything from backups too. What's our backup retention policy?",
+  "input_tokens": 107,
+  "output_tokens": 811,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "b66a2ca1-1033-4dae-b2cd-25b2841819e5",
+  "event_time": "2026-06-10 01:38:45",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Turn these hiring committee meeting notes into next steps with owners and timeline. <notes>",
+  "input_tokens": 393,
+  "output_tokens": 717,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "0adee0ff-3763-40b9-a5d2-530154dc1b44",
+  "event_time": "2026-06-09 13:26:32",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Write a query to identify churn cohorts by signup month. I want to see retention rates at 30, 60, and 90 days.",
+  "input_tokens": 314,
+  "output_tokens": 336,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "397d23c8-2101-4362-baa3-f9e1bc30741c",
+  "event_time": "2026-06-09 12:05:07",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "TL;DR this vendor proposal - cost, timeline, and whether we should move forward? <proposal_text>",
+  "input_tokens": 200,
+  "output_tokens": 710,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "c65bd317-53c8-454f-b699-908a199cb4b4",
+  "event_time": "2026-06-08 18:05:00",
+  "user_email": "maya.patel@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "SELECT statement needed: show me top 10 customers by total order value in the past year. Use orders and customers tables.",
+  "input_tokens": 235,
+  "output_tokens": 283,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "0f0a3b18-c591-41be-9be1-04f92167e01d",
+  "event_time": "2026-06-10 02:23:59",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Extract action items from the security audit meeting and prioritize by urgency with owners assigned. <audit_notes>",
+  "input_tokens": 165,
+  "output_tokens": 890,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "5a25061c-1dcd-4cd3-8dd1-c873793207e5",
+  "event_time": "2026-06-09 02:03:14",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Please draft the postmortem. Rate limiting config was too aggressive, legitimate traffic was being blocked. <config_and_traffic_analysis>",
+  "input_tokens": 215,
+  "output_tokens": 826,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "4cdeacd2-3d38-45c4-964d-db014799625c",
+  "event_time": "2026-06-09 17:11:49",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Summarize these release notes for the changelog. Keep it user-friendly. <release_notes>",
+  "input_tokens": 154,
+  "output_tokens": 793,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "b057a5d9-1b40-4f84-ba04-59739ebc5289",
+  "event_time": "2026-06-09 03:56:30",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Draft a summary of the incident. Load balancer config was accidentally reverted, caused uneven traffic distribution. <config_and_impact>",
+  "input_tokens": 313,
+  "output_tokens": 439,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "ccccbc6e-c0fd-4147-902a-4b6c0736fb03",
+  "event_time": "2026-06-09 20:44:14",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "i'm trying to parse these app error logs but the regex keeps failing. the pattern is: ^\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2})\\s(?P<level>\\w+)\\]\\s(?P<message>.+)$ - what's wrong?",
+  "input_tokens": 298,
+  "output_tokens": 866,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "503c3d3d-b408-4435-8230-9dd4a17a0649",
+  "event_time": "2026-06-09 07:40:27",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can u help me get a count of sensor_events grouped by device_id and hour? Need to find anomalies in the data.",
+  "input_tokens": 380,
+  "output_tokens": 450,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "3d28594c-1e9c-4bcb-992d-873f097889f8",
+  "event_time": "2026-06-09 18:30:34",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Draft incident postmortem from this. DNS propagation delay caused service discovery issues for 30 mins during deployment. <timeline>",
+  "input_tokens": 96,
+  "output_tokens": 514,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "5f67fca8-89fb-47b5-ac58-59e86a42e2cd",
+  "event_time": "2026-06-09 22:30:52",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Summarize the attached Terraform diff - what infrastructure is being modified and what could break? <diff>",
+  "input_tokens": 176,
+  "output_tokens": 590,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "55907ba4-9499-4446-9aa5-d43e75940e24",
+  "event_time": "2026-06-07 18:04:28",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Summarize this incident for me. Message queue consumer lag grew to 500k messages due to slow processing. <consumer_metrics>",
+  "input_tokens": 98,
+  "output_tokens": 171,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "476efd27-b6bb-4cd9-b6cd-e83d42bed363",
+  "event_time": "2026-06-10 05:26:06",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you review this deletion request and flag any legal holds or compliance issues we should be aware of before proceeding? <ticket_text>",
+  "input_tokens": 211,
+  "output_tokens": 156,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "f08cc207-3dc4-465c-81c0-189749d161b4",
+  "event_time": "2026-06-09 15:21:46",
+  "user_email": "tessa.brooks@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "What are the main risks and mitigation strategies in this incident postmortem? <postmortem_notes>",
+  "input_tokens": 339,
+  "output_tokens": 710,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "0e6cd7ec-1348-4499-82f1-23397b6024f0",
+  "event_time": "2026-06-07 18:48:17",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I need revenue by month broken down by region. Also include YoY comparison if possible. Databricks SQL pls.",
+  "input_tokens": 167,
+  "output_tokens": 854,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "83bd95bd-8659-41fb-b937-5c9b76f396e0",
+  "event_time": "2026-06-09 19:58:03",
+  "user_email": "elena.diaz@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you convert 98.6 degrees Fahrenheit to Celsius? Just checking something",
+  "input_tokens": 343,
+  "output_tokens": 298,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "abdbddb3-dae9-4a67-8935-3a7f4071e5e3",
+  "event_time": "2026-06-08 06:28:15",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write a helpful response for a customer getting CORS errors when calling our API from their frontend. Explain the issue and solution clearly.",
+  "input_tokens": 244,
+  "output_tokens": 396,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "443073d0-b268-48e5-afef-ed2f0348f11a",
+  "event_time": "2026-06-08 04:33:18",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Turn the attached client call notes into action items with owners and due dates please. <call_notes>",
+  "input_tokens": 207,
+  "output_tokens": 662,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "e4f4e3d6-76e4-4181-8199-1aaa42bd451b",
+  "event_time": "2026-06-09 07:13:15",
+  "user_email": "maya.patel@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I need bullet points on the business impact from this quarterly report. <report_content>",
+  "input_tokens": 367,
+  "output_tokens": 272,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "926a34a4-2b63-4776-8ebc-32eb0c250334",
+  "event_time": "2026-06-07 14:51:34",
+  "user_email": "jon.weiss@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I'm trying to find customers who placed orders in Jan but haven't ordered since. Need their email and last order date.",
+  "input_tokens": 342,
+  "output_tokens": 521,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "a7b67d0a-f524-484f-bb43-0cb9cb43c8c2",
+  "event_time": "2026-06-09 23:44:06",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you help me audit our email retention policy? We're deleting old emails but need to ensure we're not violating right-to-be-forgotten obligations. What's the safe retention window?",
+  "input_tokens": 228,
+  "output_tokens": 758,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "b1c6168a-c123-4a5d-a724-4e9268438f54",
+  "event_time": "2026-06-08 21:58:31",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "What's a good beginner-friendly programming language to learn in 2024?",
+  "input_tokens": 324,
+  "output_tokens": 849,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "2f3e94ae-f0fa-4c75-9928-e1781ff1b408",
+  "event_time": "2026-06-09 10:10:00",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "What's the difference between var, let, and const in JavaScript? I keep mixing them up",
+  "input_tokens": 326,
+  "output_tokens": 604,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "f7f9b222-815b-45bb-b76f-884e889d451f",
+  "event_time": "2026-06-09 00:26:09",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Quick Terraform review needed - what's changing in the VPC config, any risks, test coverage? <diff>",
+  "input_tokens": 391,
+  "output_tokens": 600,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "a9ed5048-0d0b-43a0-a9c1-3c65846cd2f1",
+  "event_time": "2026-06-09 00:26:16",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I'm reviewing a Python data pipeline change. Can you break down the diff, highlight risks, and comment on test coverage? <diff>",
+  "input_tokens": 385,
+  "output_tokens": 674,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "f40d67bd-b836-4965-a1fa-492673993f5f",
+  "event_time": "2026-06-09 00:12:35",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you review this CCPA deletion confirmation email before I send it? I want to make sure we're documenting the process properly for audit purposes. Here's the draft: <ticket text>",
+  "input_tokens": 108,
+  "output_tokens": 174,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "3cebc21a-6f7a-477b-b217-ddf0bff94496",
+  "event_time": "2026-06-09 20:48:15",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "quick classification: is this critical, who handles it, seen it before? <ticket text>",
+  "input_tokens": 138,
+  "output_tokens": 797,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "0926c8d0-bb2d-41e8-b2f7-c176202749c4",
+  "event_time": "2026-06-09 01:33:58",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you create a right-to-be-forgotten checklist specific to our tech stack? We use Salesforce, Mixpanel, Stripe, and AWS. What data lives where and how do we delete it?",
+  "input_tokens": 93,
+  "output_tokens": 258,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "a27c0d77-1388-429a-96a1-1ce275de55e4",
+  "event_time": "2026-06-07 08:59:48",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "We have a CPRA opt-out request. Customer doesn't want us selling their personal info. What's our process for flagging their profile and ensuring compliance going forward?",
+  "input_tokens": 362,
+  "output_tokens": 830,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "41a1d0aa-9864-4dfa-9633-6165a9e74542",
+  "event_time": "2026-06-09 11:43:39",
+  "user_email": "tessa.brooks@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Query to find customers acquired in each month and their 12-month retention rate. Exclude test accounts pls.",
+  "input_tokens": 181,
+  "output_tokens": 603,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "05564d90-28d0-42bd-891f-c319bb0e2f3b",
+  "event_time": "2026-06-09 00:18:28",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "is this a dup? <ticket text> - also which team owns it and how urgent?",
+  "input_tokens": 256,
+  "output_tokens": 850,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "0c108f38-b3ca-4f76-9c7d-c00fbc718e2d",
+  "event_time": "2026-06-09 02:10:33",
+  "user_email": "dev.rao@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you give me a one-paragraph summary of this Python change? Include risks and test notes. <diff>",
+  "input_tokens": 229,
+  "output_tokens": 262,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "845c4071-7cd2-408b-87c0-bceab1fb9229",
+  "event_time": "2026-06-10 11:51:47",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "CPRA request came in - data subject wants to know what categories of personal info we've collected and who we've shared it with. How should I structure the response?",
+  "input_tokens": 283,
+  "output_tokens": 307,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "f0904748-ac33-4998-8161-e1188bfb04d5",
+  "event_time": "2026-06-08 08:48:43",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you write the RCA? Deployment went out with hardcoded staging credentials, caused auth failures in prod. <deployment_diff_and_logs>",
+  "input_tokens": 231,
+  "output_tokens": 344,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "c644eaa9-9aa9-4630-af56-cf309db391aa",
+  "event_time": "2026-06-09 00:33:09",
+  "user_email": "dev.rao@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Quick question: what does this Terraform change do? Any gotchas I should know about before approving? <diff>",
+  "input_tokens": 244,
+  "output_tokens": 564,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "5d4fec7f-4381-4c81-ac52-fdd1cc8d88fc",
+  "event_time": "2026-06-10 15:21:12",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "How many ounces are in a gallon? I always forget",
+  "input_tokens": 400,
+  "output_tokens": 172,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "e62b423f-c1cd-4432-8e93-e245c94b4704",
+  "event_time": "2026-06-09 13:41:58",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "What's the best way to learn SQL? Any recommendations for tutorials or resources?",
+  "input_tokens": 216,
+  "output_tokens": 157,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "63869a9e-311c-4659-bbdd-8017217a43cd",
+  "event_time": "2026-06-09 04:23:28",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Please create a summary of this architecture review with decisions, action items, and owners. <review_notes>",
+  "input_tokens": 326,
+  "output_tokens": 821,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "3d4846a7-ee1d-475e-bed1-8e58b44d93dd",
+  "event_time": "2026-06-10 07:37:41",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you help me debug this? Getting a 404 error when I try to hit the /api/users endpoint. <error log attached>",
+  "input_tokens": 328,
+  "output_tokens": 340,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "05c34338-d36f-45f0-9a9c-79ce6ef2898b",
+  "event_time": "2026-06-07 07:39:05",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Extract blockers and action items from standup. Format as a brief status update email. <standup_transcript>",
+  "input_tokens": 296,
+  "output_tokens": 805,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "a448ff03-d25b-4e6e-9f8a-9c9cf832bb7c",
+  "event_time": "2026-06-08 13:38:33",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "This Terraform PR modifies our prod infra. Summarize changes, risks, and whether tests are solid. <diff>",
+  "input_tokens": 248,
+  "output_tokens": 442,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "43368154-7883-4615-9b8c-e7a96c45ae55",
+  "event_time": "2026-06-08 14:18:54",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "CCPA opt-out request. Customer doesn't want us selling their data. Do we need to notify third parties we've already shared with? Draft guidance for our team.",
+  "input_tokens": 335,
+  "output_tokens": 604,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "3a18008d-970e-4d00-94f0-47eb527b02b5",
+  "event_time": "2026-06-09 20:31:07",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Customer requested ability to export data in CSV format. Draft a response saying we'll consider it and ask about their use case.",
+  "input_tokens": 245,
+  "output_tokens": 266,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "2e997439-2f3e-4344-b8b8-5148d0480d4c",
+  "event_time": "2026-06-08 16:23:12",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Need help understanding this Go service PR. What's the scope of changes, what could go wrong, and is testing sufficient? <diff>",
+  "input_tokens": 411,
+  "output_tokens": 196,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "4b346fa8-2208-4e9f-ab50-baabe1bd6db4",
+  "event_time": "2026-06-09 18:11:42",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "GDPR request came in via email (not our portal). Customer is in Spain. Do we need to verify their identity differently? What's the process?",
+  "input_tokens": 298,
+  "output_tokens": 454,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "351ccefb-afca-4a3b-9445-f39b9399ac9d",
+  "event_time": "2026-06-10 00:26:43",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "New employee onboarding feature collects resume data and work history. Is this a privacy risk under GDPR? Should we add consent language? Here's the feature description: <diff>",
+  "input_tokens": 376,
+  "output_tokens": 828,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "bacac796-845b-4bc3-a8f0-a20bcf67923a",
+  "event_time": "2026-06-09 01:38:27",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "What's the fastest land animal on Earth?",
+  "input_tokens": 313,
+  "output_tokens": 411,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "66507fd3-11a8-4864-9ab9-ba6db7db20c6",
+  "event_time": "2026-06-10 13:57:51",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "help parsing these postgres slow query logs. need to extract query_time, database, user, and the actual query text. here's what im working with: <postgres_log_snippet>",
+  "input_tokens": 187,
+  "output_tokens": 585,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "d78e73e2-f31a-4360-b1d4-dbaf51a6c7d8",
+  "event_time": "2026-06-09 20:24:29",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you review our current DSAR process and flag gaps? We might be missing systems. Here's what we currently check: <notes>",
+  "input_tokens": 344,
+  "output_tokens": 211,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "80913881-784a-4d7c-b8dd-66661135fab5",
+  "event_time": "2026-06-10 13:12:36",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "can you dedupe this against our known issues list and route accordingly? <ticket text>",
+  "input_tokens": 82,
+  "output_tokens": 404,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "b4ff478b-9bd1-43cb-8942-fae343d6933d",
+  "event_time": "2026-06-07 12:01:01",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Draft a reply for a refund request. Customer says the product didn't meet expectations. Be understanding but ask clarifying questions first.",
+  "input_tokens": 280,
+  "output_tokens": 456,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "3a7fcd36-f726-4ca8-8882-cd74f5c9170e",
+  "event_time": "2026-06-10 07:21:07",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Draft a DSAR fulfillment plan for our EU customers. Need to cover: database exports, third-party data brokers, email retention, and backup procedures. Make it step-by-step.",
+  "input_tokens": 382,
+  "output_tokens": 787,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "4e6e668c-06fe-4574-90ff-f2b02e4fa72d",
+  "event_time": "2026-06-09 03:29:46",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Angry refund request - customer says product is 'completely broken.' Draft something that validates frustration, asks specifics, offers troubleshooting. <ticket text>",
+  "input_tokens": 420,
+  "output_tokens": 511,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "99c8a08d-7e72-4712-a049-bb5ea97a4b81",
+  "event_time": "2026-06-07 07:42:36",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Feature request: customer wants SSO integration. Draft something professional that acknowledges the request and explains our current auth options.",
+  "input_tokens": 328,
+  "output_tokens": 558,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "220edb91-e0e5-4351-9b30-1cf1f4f1e79a",
+  "event_time": "2026-06-08 13:50:50",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "this regex works in regex101 but not in our golang log processor. pattern: `^(?P<date>\\d{2}/\\w{3}/\\d{4}):(?P<time>\\d{2}:\\d{2}:\\d{2})` - why the difference?",
+  "input_tokens": 340,
+  "output_tokens": 822,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "a92ef89d-df8e-4efb-ac0a-d9a0d6967b3e",
+  "event_time": "2026-06-08 13:01:32",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Please extract action items from this QBR transcript with owners and deadlines. Make it a clean bulleted list. <meeting_notes>",
+  "input_tokens": 242,
+  "output_tokens": 712,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "181a0df9-2ae8-4cbc-9960-d1f57abf5310",
+  "event_time": "2026-06-09 08:36:37",
+  "user_email": "zoe.adler@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Quick question - how many grams of protein are in an egg? Trying to track my macros",
+  "input_tokens": 304,
+  "output_tokens": 638,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "65accefa-0112-4a5f-b59c-0736a92459b7",
+  "event_time": "2026-06-07 06:43:40",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Help me write up what happened during the Kafka lag incident this morning. We had 2hr backlog on the events topic. <monitoring_data_and_logs>",
+  "input_tokens": 267,
+  "output_tokens": 867,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "ddf1e8a3-8577-40b4-85f8-7b944b198775",
+  "event_time": "2026-06-07 17:06:43",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Extract the key metrics and trends from this analytics report in 5 bullets. <analytics_data>",
+  "input_tokens": 268,
+  "output_tokens": 535,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "49ad3c39-3b63-40eb-8055-dab39e07b18a",
+  "event_time": "2026-06-08 04:06:07",
+  "user_email": "dev.rao@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Go service optimization PR. Summarize the changes, performance implications, and test coverage. <diff>",
+  "input_tokens": 185,
+  "output_tokens": 556,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "f9ccd8fa-03ca-487f-9501-6503e7008049",
+  "event_time": "2026-06-09 00:40:54",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Someone requested a feature to schedule reports. Draft a response that's encouraging, asks for more details, and doesn't commit to timeline.",
+  "input_tokens": 333,
+  "output_tokens": 788,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "57177c4d-5156-4a8c-a6e7-d0aa39db609c",
+  "event_time": "2026-06-08 00:03:53",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I have 3 GDPR requests in queue and only 2 weeks left on the oldest one. Prioritize which systems I should query first: Salesforce, Marketo, data warehouse, or email?",
+  "input_tokens": 167,
+  "output_tokens": 442,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "3f640393-b9ab-45bd-8edb-91dcb2725ee3",
+  "event_time": "2026-06-09 09:04:29",
+  "user_email": "jon.weiss@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Need to identify which customer cohorts have the highest churn. Cohort = signup month. Show churn % at 6 months.",
+  "input_tokens": 247,
+  "output_tokens": 193,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "861e8c21-8294-42f3-8581-868f212ce0ef",
+  "event_time": "2026-06-09 19:28:45",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you draft a root cause analysis from these notes? We had a database connection pool exhaustion incident yesterday. Here's what happened: <incident_notes>",
+  "input_tokens": 289,
+  "output_tokens": 238,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "c299f1bb-b99c-4894-b58e-c7f00c0d6010",
+  "event_time": "2026-06-10 03:50:46",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Customer is angry their API key stopped working. Draft something that acknowledges the issue, explains the deprecation, and offers migration help. <ticket text>",
+  "input_tokens": 438,
+  "output_tokens": 243,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "1f056c01-7b2e-4b30-aadf-6bb6c950c039",
+  "event_time": "2026-06-09 22:59:06",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I've got notes from the incident commander. Can you turn this into a proper RCA? SSL cert expired on prod-api-3, caused 15% of traffic to fail. <ic_notes>",
+  "input_tokens": 373,
+  "output_tokens": 718,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "714110d5-99bf-4023-ac07-22ba5509340d",
+  "event_time": "2026-06-10 05:05:55",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Query to show average order value by customer cohort (grouped by signup_month). Include sample size and std dev if easy.",
+  "input_tokens": 336,
+  "output_tokens": 410,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "ea8b42c5-a84f-4f10-919b-aee029443a5a",
+  "event_time": "2026-06-10 05:36:13",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "can someone explain what this gnarly regex does? been staring at it for 20 mins and i dont get it: (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
+  "input_tokens": 120,
+  "output_tokens": 262,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "2c073981-dd6b-4060-9f29-6cce56f3e997",
+  "event_time": "2026-06-08 10:57:25",
+  "user_email": "jon.weiss@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Quick question - how many milliliters are in 2.5 cups? Need it for a recipe I'm making tonight",
+  "input_tokens": 358,
+  "output_tokens": 317,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "2b74b21b-e193-46d3-8801-2053a400dd26",
+  "event_time": "2026-06-09 16:09:13",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you write a short funny poem about Derek from accounting who's retiring after 15 years? Something we can read at his going away party",
+  "input_tokens": 214,
+  "output_tokens": 473,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "7ae947d7-5158-4f7d-b90b-5db1be1373d8",
+  "event_time": "2026-06-08 18:51:12",
+  "user_email": "tessa.brooks@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Quick runbook summary - what are the critical steps if the service goes down? <runbook_markdown>",
+  "input_tokens": 126,
+  "output_tokens": 162,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "14a9b500-f6ca-4952-9155-93c4b5edd249",
+  "event_time": "2026-06-08 01:50:00",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Hey, can you summarize this all-hands meeting into 3-4 key takeaways? Keep it brief for Slack. <transcript>",
+  "input_tokens": 270,
+  "output_tokens": 884,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "5e265c75-122a-495b-bc5f-975bf2e310a4",
+  "event_time": "2026-06-09 01:27:54",
+  "user_email": "zoe.adler@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "What's the capital of Kazakhstan? My kid asked me and I have no idea lol",
+  "input_tokens": 166,
+  "output_tokens": 173,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "b2d5a6cd-e3af-4b85-8255-248dadcc7eb7",
+  "event_time": "2026-06-10 13:12:32",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I need sensor_events data: give me a query that calculates uptime % by device for the last 30 days. Event_type = 'heartbeat'.",
+  "input_tokens": 137,
+  "output_tokens": 251,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "eb88d00d-74cb-44c8-a43d-a704c279949a",
+  "event_time": "2026-06-07 15:23:02",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you explain what Docker is and why we use it? I keep hearing about it in standup",
+  "input_tokens": 417,
+  "output_tokens": 742,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "f28dd24e-64dd-4240-9ddf-382134ee0ee2",
+  "event_time": "2026-06-07 20:26:20",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Is it cheaper to fly to Denver or drive from here? We're in Kansas City and need to get there next month",
+  "input_tokens": 381,
+  "output_tokens": 567,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "6bc5b741-6c38-406b-8164-b2f6ad6fc9f5",
+  "event_time": "2026-06-10 01:33:23",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Draft incident summary pls. TLS handshake failures on mobile clients due to cert chain issue. <error_logs_and_cert_info>",
+  "input_tokens": 216,
+  "output_tokens": 414,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "bdb53a96-fa9f-4153-909b-01fc1a5ed176",
+  "event_time": "2026-06-07 13:08:55",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can I get a Trino query that finds orders placed on weekends vs weekdays? Group by region and show count + avg order value.",
+  "input_tokens": 222,
+  "output_tokens": 557,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "ff8705fa-75c4-42e3-ae22-6a9e93c2ac10",
+  "event_time": "2026-06-09 20:13:30",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "New feature uses third-party cookies for tracking. Do we need to update our privacy policy and get fresh consent under GDPR? Here's the implementation: <diff>",
+  "input_tokens": 265,
+  "output_tokens": 342,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "e2d56534-49f9-451e-b333-38777b55c4a9",
+  "event_time": "2026-06-10 06:26:59",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "CCPA deletion request came in but the customer has an active subscription. Can we refuse based on ongoing contractual obligations? Need clarification on our legal obligations.",
+  "input_tokens": 225,
+  "output_tokens": 869,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "e7f33445-937a-4aed-b7a4-8b572798fc18",
+  "event_time": "2026-06-08 22:28:54",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Extract the action items from our sprint planning meeting and assign owners based on who volunteered. <sprint_notes>",
+  "input_tokens": 231,
+  "output_tokens": 286,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "17e6b755-d3b2-4329-bc07-674c392cc382",
+  "event_time": "2026-06-09 04:01:15",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Help me build a right-to-be-forgotten verification checklist. How do we confirm data is actually deleted across all our systems? Need this for our audit.",
+  "input_tokens": 142,
+  "output_tokens": 165,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "a898617f-2c55-43ef-a8c5-5c1eb515346b",
+  "event_time": "2026-06-10 06:07:10",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "seen this error before? <ticket text> - also what team owns this?",
+  "input_tokens": 376,
+  "output_tokens": 775,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "54b67801-5405-46d2-b032-9b3deba535e3",
+  "event_time": "2026-06-10 14:02:32",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "is this the same as ticket #4521? <ticket text> - also classify severity",
+  "input_tokens": 202,
+  "output_tokens": 589,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "ea6a8b81-4be9-4dc6-b738-a0bc14fb4dec",
+  "event_time": "2026-06-07 00:25:07",
+  "user_email": "ana.souza@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Give me a TL;DR of this code diff. What changed and why should I care? <diff_output>",
+  "input_tokens": 376,
+  "output_tokens": 582,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "5486268e-f9f3-4d05-9a12-49b0f76f2b32",
+  "event_time": "2026-06-09 17:27:56",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Terraform module refactor. Summarize changes, identify potential breaking changes, assess test coverage. <diff>",
+  "input_tokens": 341,
+  "output_tokens": 162,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "6ca425e8-31ec-4c12-a748-74aa0668ded3",
+  "event_time": "2026-06-08 09:25:07",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Hey, can you review this feature spec for privacy issues? It collects behavioral data from users. Here's the diff: <diff>. Need a quick privacy impact summary.",
+  "input_tokens": 290,
+  "output_tokens": 330,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "6f213ed2-a2b0-4ba9-a296-96ddbc0f8a12",
+  "event_time": "2026-06-08 18:21:50",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Python DB migration code. Summarize the diff, highlight rollback risks, and comment on test coverage. <diff>",
+  "input_tokens": 201,
+  "output_tokens": 721,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "3772db87-c5b1-4a65-95dd-c2a6cc4f04d8",
+  "event_time": "2026-06-07 11:13:52",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Go refactor - summarize for code review. Focus on: what changed, breaking changes, test adequacy. <diff>",
+  "input_tokens": 357,
+  "output_tokens": 781,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "6b519c19-32b1-4726-929d-026a907bde8d",
+  "event_time": "2026-06-07 05:20:52",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Python async code changes here. What's the diff, what risks should reviewers watch for, how's test coverage? <diff>",
+  "input_tokens": 144,
+  "output_tokens": 531,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "ec7b9c11-0d72-497a-8867-9ba51c853055",
+  "event_time": "2026-06-08 04:59:17",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Someone requested bulk export feature. Draft a polite response saying we'll pass it to product team. Ask them how they'd use it.",
+  "input_tokens": 328,
+  "output_tokens": 755,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "37de82a7-57b7-4071-b787-7cf4754dc5c6",
+  "event_time": "2026-06-09 07:27:13",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you help me understand what counts as 'personal data' under GDPR for our use case? We store user IDs, IP logs, and behavioral events. Which ones need to be included in DSARs?",
+  "input_tokens": 125,
+  "output_tokens": 341,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "167cc7f7-19f6-48ee-8b56-9b5f15b0a217",
+  "event_time": "2026-06-07 22:36:49",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Draft incident summary. Database connection pool exhaustion due to unclosed connections in new feature code. <code_review_and_metrics>",
+  "input_tokens": 246,
+  "output_tokens": 308,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "91504f83-5192-4e57-b44f-d60dcf044611",
+  "event_time": "2026-06-08 17:21:07",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Summarize this Go dependency upgrade PR. What changed, compatibility risks, test coverage? <diff>",
+  "input_tokens": 333,
+  "output_tokens": 766,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "4e08fbb9-e971-4671-93fa-e29b32a7de2c",
+  "event_time": "2026-06-08 04:53:35",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "I need a query to find high-value customers (top 20% by LTV) who haven't ordered in 60+ days. Include their contact info.",
+  "input_tokens": 119,
+  "output_tokens": 444,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "c760b276-f319-4f09-b18f-2647c381141d",
+  "event_time": "2026-06-10 09:45:03",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you explain what REST API means in simple terms? I keep hearing it at work but don't really get it",
+  "input_tokens": 228,
+  "output_tokens": 479,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "3c446496-4324-4d57-a658-b630aaf9e5da",
+  "event_time": "2026-06-07 06:54:48",
+  "user_email": "ana.souza@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Help me document this outage. Kafka broker disk full, caused message lag and eventual broker restart. <broker_logs>",
+  "input_tokens": 335,
+  "output_tokens": 341,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "7ddff7c0-48ad-4521-bc58-c79f538734ad",
+  "event_time": "2026-06-07 22:40:10",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I'm getting this weird bug where the database query returns null sometimes but not always. Any ideas what could cause intermittent failures?",
+  "input_tokens": 194,
+  "output_tokens": 621,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "a6b86866-a233-4b3a-bd3f-45647c898811",
+  "event_time": "2026-06-09 12:34:02",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "I'm planning a trip to Barcelona for 3 days. What are the must-see attractions and how should I budget my time?",
+  "input_tokens": 102,
+  "output_tokens": 264,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "c94b88db-8d01-48d9-a6cf-d4ed031c5205",
+  "event_time": "2026-06-08 16:33:42",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Write something apologetic for this login error. User can't access their account after password change. Keep it brief and solution-focused. <ticket text>",
+  "input_tokens": 357,
+  "output_tokens": 805,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "6bce4e8a-991a-43db-8e0c-a4da57c9c82b",
+  "event_time": "2026-06-07 04:21:01",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "CCPA deletion request came in today. Customer wants everything removed by Jan 15. Need a checklist of all systems we need to purge: CRM, email archives, analytics, S3 backups. What am I missing?",
+  "input_tokens": 232,
+  "output_tokens": 374,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "b464bbca-c18f-4527-a6c8-af014822c1c0",
+  "event_time": "2026-06-08 11:50:51",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "I need to verify we've completed a right-to-be-forgotten request. Customer deleted their account 30 days ago. What systems should I audit to confirm all traces are gone?",
+  "input_tokens": 386,
+  "output_tokens": 336,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "02a21ea9-a2a7-43ee-aa56-e84a17945a20",
+  "event_time": "2026-06-07 10:56:29",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Write a reply to someone who's very upset about being charged after canceling. Take full responsibility and promise immediate refund. <ticket text>",
+  "input_tokens": 279,
+  "output_tokens": 191,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "fee2e130-8a47-4dbb-853e-4fb7319e2c8d",
+  "event_time": "2026-06-09 06:16:00",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "API endpoint returning 500 errors intermittently. Draft a response acknowledging the issue, explaining what we're doing, and offering workaround. <ticket text>",
+  "input_tokens": 381,
+  "output_tokens": 474,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "817497c6-4ff2-424d-8329-7aa172724654",
+  "event_time": "2026-06-10 11:17:15",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Help me write a denial letter for a CCPA deletion request. We have a legitimate legal reason to retain the data. Need to explain it clearly without admitting liability.",
+  "input_tokens": 228,
+  "output_tokens": 660,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "9f03f760-73dd-47fb-9208-69630f960a08",
+  "event_time": "2026-06-07 17:49:25",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Show me sensor_events grouped by hour for the last week, filtered to event_severity >= 2. Need count and avg response_time.",
+  "input_tokens": 288,
+  "output_tokens": 829,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "c498d96a-234f-40b2-9dac-378d8ddb511c",
+  "event_time": "2026-06-07 06:28:30",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write a response to someone locked out after too many login attempts. Explain the security feature, apologize for inconvenience, offer unlock.",
+  "input_tokens": 263,
+  "output_tokens": 233,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "fce4b080-1094-452d-82d1-a610e1e07c96",
+  "event_time": "2026-06-09 01:48:24",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I need a query on sensor_events: devices that reported >100 events in a single day. Show device_id, date, event_count, and error_count.",
+  "input_tokens": 140,
+  "output_tokens": 227,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "fe00cbca-8c69-40b4-ae0f-63202aaf314e",
+  "event_time": "2026-06-09 13:35:10",
+  "user_email": "hana.sato@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you check if this data subject request is valid? Customer provided minimal info. How much verification do we legally need before we process? <ticket_text>",
+  "input_tokens": 338,
+  "output_tokens": 712,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "f5326cd8-e2d1-4d19-8a3f-fa44b7ec5db1",
+  "event_time": "2026-06-09 17:41:34",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Write me a professional but warm thank you email to send to our departing team lead. Keep it to 3-4 sentences",
+  "input_tokens": 306,
+  "output_tokens": 573,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "add44bf6-3276-48ed-aeba-7975cf25ec03",
+  "event_time": "2026-06-10 11:00:12",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Angry customer here - charged twice for subscription. Draft something that takes responsibility, explains what happened, and promises a fix. <ticket text>",
+  "input_tokens": 153,
+  "output_tokens": 647,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "28b92fc2-2b2f-46c0-bea0-39ca905e3417",
+  "event_time": "2026-06-08 04:55:25",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can u give me a query that shows customer acquisition cost by region? Orders, customers, and marketing_spend tables involved.",
+  "input_tokens": 156,
+  "output_tokens": 340,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "f121b083-b99b-4cdb-bfd5-38dda0be732b",
+  "event_time": "2026-06-10 15:37:56",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you help me understand what this error means? 'TypeError: Cannot read property of undefined' - I'm getting it in my React component when trying to map over an array",
+  "input_tokens": 93,
+  "output_tokens": 269,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "087b5b47-3f41-479d-b9a3-cd4104fce1d3",
+  "event_time": "2026-06-08 14:59:37",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Show me sensor_events where event_type = 'error' and severity > 3, last 48 hours. Group by sensor_id and error_code.",
+  "input_tokens": 133,
+  "output_tokens": 159,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "709e6aeb-1636-490b-aa4b-560391a73e27",
+  "event_time": "2026-06-07 21:02:50",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "What's the largest planet in our solar system?",
+  "input_tokens": 311,
+  "output_tokens": 674,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "929bd88c-be9a-4789-9f10-8d2a5201f13a",
+  "event_time": "2026-06-10 07:22:22",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Draft a CCPA disclosure response. Customer wants to know what personal info we have, where it came from, and who we shared it with. Make it comprehensive but concise.",
+  "input_tokens": 136,
+  "output_tokens": 818,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "0096ec78-3920-4372-8aa9-7cb9f77f2ddb",
+  "event_time": "2026-06-10 14:22:45",
+  "user_email": "ana.souza@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "writing a log parser for our api gateway. need to extract: timestamp, http_method, path, query_params, status, latency_ms, user_id. sample line attached: <sample>",
+  "input_tokens": 156,
+  "output_tokens": 172,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "4a0a17c7-72b5-4f06-8fd7-2446fc0d669f",
+  "event_time": "2026-06-10 16:19:11",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you draft the RCA? Certificate renewal failed silently, we only noticed when it expired and traffic dropped. <monitoring_alerts>",
+  "input_tokens": 367,
+  "output_tokens": 470,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "3c9af820-1492-4d2c-9335-72f6e2b8ab96",
+  "event_time": "2026-06-08 10:48:00",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Draft a template email for a GDPR right-to-be-forgotten verification. We need to confirm the person's identity and document our process. Should take ~5 mins to customize per request.",
+  "input_tokens": 390,
+  "output_tokens": 531,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "91fab2c0-660a-4305-897f-8b6820d98c12",
+  "event_time": "2026-06-07 09:24:32",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Find customers in churn cohort Q1_2023 and show their engagement metrics (orders, revenue, last_order_date).",
+  "input_tokens": 185,
+  "output_tokens": 400,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "f4644bb5-70cf-4d2c-b1cf-be14dad9db2a",
+  "event_time": "2026-06-10 07:25:08",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write SQL to get revenue by region and month for the last 18 months. Also need a running total column.",
+  "input_tokens": 119,
+  "output_tokens": 847,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "67f91268-1700-4f2a-87a1-99a0323aaa3b",
+  "event_time": "2026-06-09 00:53:58",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I need an RCA drafted ASAP. Memory leak in the auth service, we had to restart it 3 times in 2 hours. <logs_and_heap_dumps>",
+  "input_tokens": 409,
+  "output_tokens": 557,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "106b3daf-e3dd-4d9d-8118-644e25ed58aa",
+  "event_time": "2026-06-10 06:54:58",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I need a summary of all CCPA requests we've received in Q4. Can you help me format this for our privacy officer? Include request type, resolution time, and any issues.",
+  "input_tokens": 276,
+  "output_tokens": 882,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "3c84bfbe-eb72-416b-9c47-a3a386b76aa4",
+  "event_time": "2026-06-07 09:16:01",
+  "user_email": "ana.souza@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you turn these notes into an RCA? Database query timeout increased, cascaded to API timeouts. <query_analysis_and_logs>",
+  "input_tokens": 301,
+  "output_tokens": 640,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "590f7a51-efe3-40d3-bafb-4d598150356c",
+  "event_time": "2026-06-07 16:14:59",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "quick triage: severity, team, summary in one line. <ticket text>",
+  "input_tokens": 377,
+  "output_tokens": 575,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "5cc2c2e2-9775-45e1-948d-b39e8fdf6236",
+  "event_time": "2026-06-10 16:53:24",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "hey, quick question - is this a dup of the login issue from last week? <ticket text>",
+  "input_tokens": 114,
+  "output_tokens": 857,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "f4a3703b-90e6-4622-921b-8f2d2a107415",
+  "event_time": "2026-06-09 09:00:39",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Customer's API integration broke after our update yesterday. Draft a technical but non-condescending explanation + next steps. <diff>",
+  "input_tokens": 398,
+  "output_tokens": 608,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "e8868880-44af-448f-9788-9fea799e04bd",
+  "event_time": "2026-06-07 10:46:40",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you make a recap of this retrospective with action items to improve our process? Include owners. <retro_notes>",
+  "input_tokens": 115,
+  "output_tokens": 877,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "336302e3-32df-4987-920f-2d08c4198e83",
+  "event_time": "2026-06-08 17:20:40",
+  "user_email": "maya.patel@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "How do I make homemade pasta from scratch? Is it actually worth the effort or should I just buy it?",
+  "input_tokens": 87,
+  "output_tokens": 465,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "3b40ada4-61dd-4050-b372-25e052f399ce",
+  "event_time": "2026-06-09 17:18:39",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you write a warm response to a feature request for dark mode? We're considering it but nothing's decided yet. Don't promise anything.",
+  "input_tokens": 309,
+  "output_tokens": 663,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "b75856b6-3f9e-4c80-b776-2dbae40d3dd6",
+  "event_time": "2026-06-09 03:07:37",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you draft the incident summary? We need it for the 4pm all-hands. Redis failover took longer than expected, impacted sessions. <incident_details>",
+  "input_tokens": 132,
+  "output_tokens": 179,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "908421ec-39d5-4e03-81e0-b9683a0cab74",
+  "event_time": "2026-06-09 16:34:55",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "triage this support ticket for me: severity, team, summary, dupe check. <ticket text>",
+  "input_tokens": 94,
+  "output_tokens": 161,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "9bf28cf1-0f55-4307-a249-1b284713af9c",
+  "event_time": "2026-06-07 19:06:26",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "triage this asap: <ticket text> - critical customer, need severity and team",
+  "input_tokens": 256,
+  "output_tokens": 548,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "a688952c-769e-439e-a3d4-7bf52257c78e",
+  "event_time": "2026-06-09 11:38:02",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you convert 5 kilometers to miles for me?",
+  "input_tokens": 110,
+  "output_tokens": 702,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "699f5375-af70-41fc-b9b8-1feae9186d19",
+  "event_time": "2026-06-09 14:00:35",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Please write up the incident. Misconfigured circuit breaker caused entire dependency to be marked unhealthy. <config_and_logs>",
+  "input_tokens": 85,
+  "output_tokens": 728,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "c457db09-0feb-44b9-b401-bee041562219",
+  "event_time": "2026-06-07 01:12:53",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Draft a professional response to this customer who's upset about a delayed refund. Keep it empathetic but firm about our 5-7 day policy. <ticket text>",
+  "input_tokens": 244,
+  "output_tokens": 878,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "0f8fc966-fb2d-48a7-b5b4-17ada9bebca1",
+  "event_time": "2026-06-10 03:37:17",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Customer's API rate limit was hit unexpectedly. Draft an explanation of how limits work + how to request increase. Professional tone.",
+  "input_tokens": 385,
+  "output_tokens": 729,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "bc9aef2a-d6a6-48ac-a647-bf258c6f0825",
+  "event_time": "2026-06-07 01:26:58",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Customer's API key was accidentally exposed in their GitHub repo. Draft something urgent but not panic-inducing about rotating keys. <ticket text>",
+  "input_tokens": 227,
+  "output_tokens": 178,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "0632060d-42f3-4417-86ff-41cd6ed1746a",
+  "event_time": "2026-06-07 20:56:25",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Go PR incoming - could you give me the executive summary? Changed code, risks, test situation. <diff>",
+  "input_tokens": 159,
+  "output_tokens": 176,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "1db11ba0-a188-4532-8304-685b4379db93",
+  "event_time": "2026-06-09 12:05:52",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Python refactor here. Summarize the changes, flag any risky patterns, and let me know if tests cover the new code. <diff>",
+  "input_tokens": 170,
+  "output_tokens": 629,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "5c689594-5093-4f28-9b84-9cba2c519bba",
+  "event_time": "2026-06-08 10:48:59",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I have this code snippet that's not working. Can you spot the bug? <code snippet: function addNumbers(a, b) { return a + c; }</code>",
+  "input_tokens": 252,
+  "output_tokens": 896,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "081d7b4c-8e8a-4cf6-bd6f-3b0265a1ae70",
+  "event_time": "2026-06-07 11:51:27",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can u break down this 50-page requirements doc into the top 10 action items for our team?",
+  "input_tokens": 363,
+  "output_tokens": 350,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "2adadaa6-3406-433c-8472-37acc69f1a13",
+  "event_time": "2026-06-10 14:13:39",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Please turn this vendor evaluation meeting into a decision summary with next steps and owners. <notes>",
+  "input_tokens": 252,
+  "output_tokens": 553,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "1dbc3c6a-f2ba-439b-9041-af8b04fd204c",
+  "event_time": "2026-06-08 04:32:47",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you draft a denial letter for a GDPR access request? We believe this is a manifestly unfounded request. Need legal-sounding language but keep it clear.",
+  "input_tokens": 322,
+  "output_tokens": 812,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "6683625b-1347-412f-a8b2-d62227cbdab3",
+  "event_time": "2026-06-07 14:39:56",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Refund request - customer says they didn't authorize the charge. Draft something that takes this seriously and outlines next steps. <ticket text>",
+  "input_tokens": 153,
+  "output_tokens": 209,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "4ba4f31e-1d87-4b9e-b5e6-9606f0d1be78",
+  "event_time": "2026-06-07 14:46:16",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Terraform security group changes - summarize what's being modified, potential security implications, test status. <diff>",
+  "input_tokens": 94,
+  "output_tokens": 714,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "d7b745ea-22ea-47fa-955e-02045a899650",
+  "event_time": "2026-06-09 07:03:23",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Customer says our API docs are confusing. Draft something that apologizes, offers support, and asks for specific feedback. <ticket text>",
+  "input_tokens": 166,
+  "output_tokens": 397,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "aefcaa5b-522d-4920-8ecb-f8dc130c81bf",
+  "event_time": "2026-06-07 10:12:30",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Please create a root cause analysis doc from these deployment notes. Bad canary deploy at 3:42pm caused latency spike to 5s p99. <deploy_log_and_metrics>",
+  "input_tokens": 232,
+  "output_tokens": 832,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "1543d725-ebfb-42ff-841d-8f0c8c4194fb",
+  "event_time": "2026-06-07 16:35:56",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "hey need a trino query fast - sensor_events table joined w/ revenue_by_month to show avg event count per region. group by month and region_name. also need to exclude test customers somehow. here's the schema <diff: added new columns last week> - lemme know if u need more details",
+  "input_tokens": 373,
+  "output_tokens": 161,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "ba921935-5a01-4ca2-b84c-2efc69b4d3c2",
+  "event_time": "2026-06-08 10:42:17",
+  "user_email": "hana.sato@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Privacy review needed: we're integrating a new third-party vendor. They'll have access to customer PII. What GDPR/CCPA questions should we ask them before signing?",
+  "input_tokens": 355,
+  "output_tokens": 738,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "3e54bf23-477e-4147-ad7d-4d1a2f65dd47",
+  "event_time": "2026-06-08 12:54:43",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "classify severity for me: <ticket text> - also give me a one liner summary pls",
+  "input_tokens": 77,
+  "output_tokens": 829,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "c9b00ffe-8226-4002-bdd4-abd59d914db4",
+  "event_time": "2026-06-08 18:34:31",
+  "user_email": "zoe.adler@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you help me understand this merge conflict in git? <diff showing conflict markers>",
+  "input_tokens": 385,
+  "output_tokens": 415,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "5166b734-d849-4e9e-9a8f-e1b9b19eba8e",
+  "event_time": "2026-06-10 14:35:35",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Condense this API documentation into a quick reference for devs - just the essentials. <api_docs>",
+  "input_tokens": 156,
+  "output_tokens": 204,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "f87d8393-ab9a-4d8a-bdf0-86b947102e5f",
+  "event_time": "2026-06-10 08:46:41",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write a reply to a customer with a 401 Unauthorized error on login. Troubleshoot step-by-step. Be patient, they're not technical.",
+  "input_tokens": 408,
+  "output_tokens": 163,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "ad42c9b3-ed53-4442-b54e-d9f706a21cbd",
+  "event_time": "2026-06-08 02:24:10",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Help draft a response to a GDPR rectification request. Customer says their address is wrong in our system. What's our legal obligation here and timeline?",
+  "input_tokens": 202,
+  "output_tokens": 160,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "e71e09b1-095d-4887-84cc-74ca5500ef68",
+  "event_time": "2026-06-08 10:28:45",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Turn these rough notes into a formal RCA. CDN misconfiguration caused image delivery to be 10x slower for EU users. <notes_and_config_diff>",
+  "input_tokens": 302,
+  "output_tokens": 427,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "870c788c-964c-40e7-9fdc-969b67541072",
+  "event_time": "2026-06-09 00:35:07",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "can you triage this ticket? <ticket text> - need to know if it's critical, which team should handle it, and if we've seen this before",
+  "input_tokens": 119,
+  "output_tokens": 277,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "102ac24a-441d-491a-94ec-3e8ccb535f2c",
+  "event_time": "2026-06-09 01:30:21",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Find all orders where order_value is an outlier (>3 std devs from mean) by region. Include customer_id and order_date. Databricks pls.",
+  "input_tokens": 145,
+  "output_tokens": 170,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "e1da7f4f-e56f-4564-a83a-0a8abcdbf3b5",
+  "event_time": "2026-06-07 11:20:16",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "route this to the right team and tell me if it's high priority: <ticket text>",
+  "input_tokens": 174,
+  "output_tokens": 181,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "86d29256-e359-42de-a80d-8b4bbeb43915",
+  "event_time": "2026-06-07 11:05:43",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Draft a response for an API integration that's timing out. Ask diagnostic questions but don't make them feel dumb. <ticket text>",
+  "input_tokens": 204,
+  "output_tokens": 476,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "f0acab57-b087-4279-9e77-6c04b243b6ea",
+  "event_time": "2026-06-07 16:30:02",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Summarize this customer feedback session into key themes and follow-up tasks with owners. <session_notes>",
+  "input_tokens": 126,
+  "output_tokens": 150,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "c6d5d68d-ad29-442d-9887-66263291d834",
+  "event_time": "2026-06-08 13:05:20",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Turn this design review feedback into actionable tasks. Include who needs to do what and when. <design_review_notes>",
+  "input_tokens": 335,
+  "output_tokens": 438,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "f3655f9e-2b26-4d93-b847-d39a1869e122",
+  "event_time": "2026-06-07 11:27:52",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write a friendly reply to someone having trouble logging in. They're a new user and seem frustrated. Explain the password reset process clearly.",
+  "input_tokens": 258,
+  "output_tokens": 411,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "7cb399c4-22a0-4af3-bd5a-2cd3e08a2a32",
+  "event_time": "2026-06-10 08:29:05",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Need Trino SQL: pull all orders with order_status = 'cancelled' from last quarter, group by cancellation_reason.",
+  "input_tokens": 343,
+  "output_tokens": 552,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "f1bed00e-7125-4d60-80f2-6dd1543803a3",
+  "event_time": "2026-06-07 01:02:22",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Make a recap email from these product roadmap discussion notes. Focus on decisions made and next steps. <notes>",
+  "input_tokens": 322,
+  "output_tokens": 595,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "ce92d78f-089e-4a28-8e34-780df9c5e2c8",
+  "event_time": "2026-06-07 18:51:54",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Is it true that honey never expires? My roommate says it does but I think it lasts forever",
+  "input_tokens": 389,
+  "output_tokens": 688,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "ea616fd8-d047-4f86-8279-1f7fea193613",
+  "event_time": "2026-06-09 17:00:02",
+  "user_email": "ana.souza@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "How do I make a proper risotto? I tried last week and it came out mushy. What am I doing wrong?",
+  "input_tokens": 292,
+  "output_tokens": 395,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "cf7ddaf0-52b5-4f6a-8d92-4e6734e9afa4",
+  "event_time": "2026-06-10 12:32:30",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you pull out the key findings from this audit report? Focus on compliance risks. <audit_doc>",
+  "input_tokens": 196,
+  "output_tokens": 264,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "1512fd7f-bed7-4f33-8f14-ed6050b02555",
+  "event_time": "2026-06-10 05:29:18",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Please summarize this outage for the postmortem. Started 2:15am, lasted 45 mins, affected checkout service. <timeline_and_impact>",
+  "input_tokens": 118,
+  "output_tokens": 821,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "a2ed2bc3-396f-478e-a865-0561bad0cf62",
+  "event_time": "2026-06-09 04:00:38",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Write a helpful response for someone locked out of their account. They forgot their email. Keep it simple and reassuring.",
+  "input_tokens": 111,
+  "output_tokens": 554,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "422a4928-6389-4302-8b3e-4609d497cd90",
+  "event_time": "2026-06-10 00:27:48",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I'm prepping a GDPR access request response. Customer asked for data in a specific format (XML). Is this reasonable under the regulation? How should I respond?",
+  "input_tokens": 115,
+  "output_tokens": 835,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "6d57ba39-3e46-4117-88c4-006a99ed3408",
+  "event_time": "2026-06-10 08:28:43",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "We're getting slammed with DSARs this week. Can you create a master checklist for fulfilling access requests across CRM, email archives, warehouse DB, and S3 backups?",
+  "input_tokens": 156,
+  "output_tokens": 546,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "77fe08ba-8544-4ba2-86f7-cc122c04d305",
+  "event_time": "2026-06-10 06:32:09",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "check if this is a dupe and route to appropriate team: <ticket text>",
+  "input_tokens": 98,
+  "output_tokens": 625,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "4cb36af1-ef17-4b83-b8f5-11f628933035",
+  "event_time": "2026-06-07 05:10:14",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Got a GDPR request from an EU customer. They're asking for data portability in a structured, commonly-used format. What format should I recommend and how do I prepare the export?",
+  "input_tokens": 234,
+  "output_tokens": 228,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "6b427c5b-6282-4a0a-91ff-ad110ced6177",
+  "event_time": "2026-06-10 12:32:28",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "GDPR access request deadline is tomorrow and I'm missing data from our email system. Can you help me draft a brief extension request explaining the delay? Keep it professional.",
+  "input_tokens": 282,
+  "output_tokens": 895,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "bce7b584-ae77-4a52-80c8-54fe62fd612f",
+  "event_time": "2026-06-07 14:02:55",
+  "user_email": "pat.murphy@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "my java regex works locally but fails in our log parser. trying to match UUIDs: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} - any ideas why?",
+  "input_tokens": 319,
+  "output_tokens": 526,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "00e63190-ce3f-4c0d-829b-57396bdb5d3c",
+  "event_time": "2026-06-08 18:55:41",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Help document this. Cascading failures when one microservice became slow, timeouts propagated upstream. <trace_data_and_timeline>",
+  "input_tokens": 293,
+  "output_tokens": 743,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "0e0669ee-6248-48a2-8321-1977618f3c2d",
+  "event_time": "2026-06-09 21:24:10",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Extract the decisions and action items from this cross-functional sync. Format for email distribution. <meeting_transcript>",
+  "input_tokens": 258,
+  "output_tokens": 474,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "83eba2a0-1f7b-4b00-8f05-431f50192a41",
+  "event_time": "2026-06-08 09:00:26",
+  "user_email": "omar.haddad@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you write me a Databricks SQL query? I need to join orders and customers tables to find total revenue by region for last quarter. Also filter where churn_cohort != 'churned'. Columns are order_id, customer_id, region, order_date, revenue. <ticket text: need this for exec dashboard by EOD>",
+  "input_tokens": 458,
+  "output_tokens": 664,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "4efd1722-4541-4f7e-aca3-ad28f975533d",
+  "event_time": "2026-06-09 22:13:40",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "can you tell me severity + if we've fixed this b4? <ticket text>",
+  "input_tokens": 105,
+  "output_tokens": 269,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "b82854b9-d4bf-40f2-a853-27c9de833811",
+  "event_time": "2026-06-10 10:43:35",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "GDPR access request from someone in France. They're asking for logs of who accessed their data. Do we have to provide this? What's our legal obligation?",
+  "input_tokens": 415,
+  "output_tokens": 893,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "df495664-4287-4414-b01d-bdd974fefd38",
+  "event_time": "2026-06-09 04:07:41",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "new ticket came in, need: severity level, team assignment, one-line summary. <ticket text>",
+  "input_tokens": 279,
+  "output_tokens": 590,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "86ce0c56-560d-4b3a-b9f0-00edd107f0e1",
+  "event_time": "2026-06-10 04:35:53",
+  "user_email": "tessa.brooks@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you write me a SQL query to find all orders placed in the last 30 days where the customer lifetime value exceeds $5000? I need it in Databricks SQL.",
+  "input_tokens": 258,
+  "output_tokens": 523,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "757edab9-cc8b-4290-ae20-e997633dd29d",
+  "event_time": "2026-06-09 04:12:56",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Terraform module update attached. Can you explain what's changing, potential blast radius, and test coverage status? <diff>",
+  "input_tokens": 406,
+  "output_tokens": 897,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "cb89005a-ce33-414e-ba64-b09e3da71420",
+  "event_time": "2026-06-09 07:24:30",
+  "user_email": "liam.walsh@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "customer escalation - <ticket text> - need severity, team, and if it's a known issue",
+  "input_tokens": 265,
+  "output_tokens": 518,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "7a7ec869-61a6-4c41-9401-2773c8bd9ab8",
+  "event_time": "2026-06-09 01:49:53",
+  "user_email": "raj.iyer@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Hey, I'm trying to figure out the best time to visit Japan in 2024. What months have good weather but aren't super crowded with tourists?",
+  "input_tokens": 230,
+  "output_tokens": 830,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "876a245d-4dcf-45eb-bd25-629ad8745e04",
+  "event_time": "2026-06-10 08:01:28",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I need a query that joins orders and customers to show me revenue by region for Q4 2023. Trino dialect please.",
+  "input_tokens": 306,
+  "output_tokens": 484,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "7ec4d0a5-bdd5-4f48-a4a1-336c6d4c484b",
+  "event_time": "2026-06-07 17:06:57",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you summarize this Python PR for me? Focus on what changed, potential risks, and whether test coverage looks adequate. <diff>",
+  "input_tokens": 296,
+  "output_tokens": 630,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "cb3d35ba-6c54-4c5a-a34f-24ce6b89448c",
+  "event_time": "2026-06-10 06:40:07",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you parse this 1:1 meeting and pull out the development goals with timelines? <meeting_transcript>",
+  "input_tokens": 303,
+  "output_tokens": 160,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "a8d802ad-dfd9-4ecb-9060-58c096117e35",
+  "event_time": "2026-06-07 03:08:46",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Summarize the customer feedback from this ticket thread - what are the main complaints and feature requests? <ticket_text>",
+  "input_tokens": 254,
+  "output_tokens": 853,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "c16a00f5-fffd-4261-927a-f91b84ec890a",
+  "event_time": "2026-06-07 17:11:45",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "customer says their dashboard is broken. <ticket text> - how bad is this and who should fix it?",
+  "input_tokens": 214,
+  "output_tokens": 556,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "1fce36be-9a95-4b5f-a89d-50c57c36aa3b",
+  "event_time": "2026-06-08 20:59:53",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Write up what happened during the latency incident. Turns out a new index wasn't being used by the query planner. <query_plan_and_timeline>",
+  "input_tokens": 245,
+  "output_tokens": 478,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "2bb4a86b-ba7c-4154-b01b-3db44205dfc6",
+  "event_time": "2026-06-10 04:25:43",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "triage: severity, known issue check, team routing, one-line summary. <ticket text>",
+  "input_tokens": 229,
+  "output_tokens": 275,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "af333554-48fe-4304-ae82-f4413f2a4988",
+  "event_time": "2026-06-10 06:50:42",
+  "user_email": "mikhail.petrov@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Draft an incident summary from the attached Slack thread. OOM on the recommendation engine, we restarted it but need to understand why memory usage spiked. <slack_export>",
+  "input_tokens": 440,
+  "output_tokens": 215,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "7ae8ca4d-7f39-4645-91dc-97df5e3c6569",
+  "event_time": "2026-06-08 09:03:02",
+  "user_email": "sara.kim@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Databricks SQL query needed: show orders per customer, but only for customers who've spent > $1000 total. Include avg order size.",
+  "input_tokens": 144,
+  "output_tokens": 574,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "6f572d6e-d687-4ba6-91ee-ee530dc8f912",
+  "event_time": "2026-06-07 08:23:18",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you help me query sensor_events to find devices that haven't reported data in the last 7 days? Need device_id and last_event_timestamp.",
+  "input_tokens": 179,
+  "output_tokens": 410,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "0d932e82-60c3-4d22-9a48-2b1b721c0583",
+  "event_time": "2026-06-08 04:14:20",
+  "user_email": "ruth.lang@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you summarize this design doc into 5 bullet points? Focus on the architecture changes and timeline. <design_doc_content>",
+  "input_tokens": 105,
+  "output_tokens": 163,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "4daeb4b6-a4a0-4a7d-94b8-0750491215fa",
+  "event_time": "2026-06-09 14:03:43",
+  "user_email": "dev.rao@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Can you summarize what happened? Elasticsearch cluster became unresponsive, search was down for 20 mins. <cluster_status_and_logs>",
+  "input_tokens": 123,
+  "output_tokens": 511,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "a94fa565-0482-4c54-8333-96f4fdaf0f17",
+  "event_time": "2026-06-10 13:30:42",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "need a grok pattern for docker container logs. format is: timestamp [level] component: message. also sometimes has stack traces. example: <docker_log_example>",
+  "input_tokens": 238,
+  "output_tokens": 747,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "ad3f52fd-53cc-4976-a9bb-cf12f5ddd3ce",
+  "event_time": "2026-06-09 13:55:46",
+  "user_email": "jon.weiss@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Write a query showing top 5 regions by revenue, with breakdown by product_category. Last 12 months only.",
+  "input_tokens": 332,
+  "output_tokens": 834,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "d4f891e4-e83d-45cf-b14a-ae94bbdd8df5",
+  "event_time": "2026-06-09 02:07:15",
+  "user_email": "tom.nagy@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you write SQL to calculate revenue by region and month, but also include forecast for next month based on trend?",
+  "input_tokens": 346,
+  "output_tokens": 308,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "15c04c9c-d59f-4d85-a16d-ee490795fb11",
+  "event_time": "2026-06-10 00:22:16",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "CPRA request just landed. Customer is asking for the specific categories of data we collected and our purposes. Draft a response template that's legally sound but customer-friendly.",
+  "input_tokens": 255,
+  "output_tokens": 417,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "8b706098-b879-43c3-8be3-1b0927edd359",
+  "event_time": "2026-06-08 23:37:45",
+  "user_email": "maya.patel@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you write a query to compare revenue by region month-over-month? I need variance % too. <notes: for exec dashboard>",
+  "input_tokens": 121,
+  "output_tokens": 374,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "c0cce0f0-e480-4b28-9f34-e95c9b1ceb81",
+  "event_time": "2026-06-10 08:23:46",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I need an exec summary of this vendor contract - what are the key terms, pricing, and any red flags I should know about? <contract_text>",
+  "input_tokens": 353,
+  "output_tokens": 234,
+  "latent_pattern": "doc_summarize"
+ },
+ {
+  "request_id": "8fe5d842-cfe9-4bf4-97e1-c2eab6f7ec84",
+  "event_time": "2026-06-09 19:24:50",
+  "user_email": "rosa.flores@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you summarize the privacy implications of this new feature we're shipping? It collects location data. Need to know if we need to update privacy policy or send notices. <diff>",
+  "input_tokens": 140,
+  "output_tokens": 424,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "46f9bd08-5e91-49e7-baa9-fb03f9d63a35",
+  "event_time": "2026-06-10 09:07:00",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Query sensor_events: find all events where temperature > 95 or humidity < 20%. Group by location_id, order by event_timestamp DESC.",
+  "input_tokens": 176,
+  "output_tokens": 173,
+  "latent_pattern": "nl2sql"
+ },
+ {
+  "request_id": "b65ff299-f098-46bb-9a2e-bd2cd257d92c",
+  "event_time": "2026-06-09 16:40:18",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Can you turn these standup notes into a quick recap email for the team? Just the key blockers and wins. <notes>",
+  "input_tokens": 246,
+  "output_tokens": 343,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "013a7119-0f45-40e6-b1dd-943090b2cc32",
+  "event_time": "2026-06-07 08:35:08",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I have conflicting notes on whether we need to honor this GDPR request. Here's the context: <notes>. Can you help me determine if it's a valid DSAR?",
+  "input_tokens": 95,
+  "output_tokens": 495,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "36c79701-28ba-4777-9f7f-b254d21c3eb3",
+  "event_time": "2026-06-10 14:17:48",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Customer can't reset password - keeps getting error message. Draft a troubleshooting response with 3-4 clear steps to try. Keep it friendly.",
+  "input_tokens": 229,
+  "output_tokens": 160,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "548fff78-240c-4b70-9beb-8e9fc6e9222c",
+  "event_time": "2026-06-10 14:01:35",
+  "user_email": "hana.sato@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "We got a GDPR request from someone claiming to be a data subject's representative. What verification steps do I need to take before releasing their data?",
+  "input_tokens": 432,
+  "output_tokens": 564,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "913e6135-d78a-4320-a4b0-21f3f9145144",
+  "event_time": "2026-06-07 14:47:18",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "does this match any known issues? <ticket text> - if not, classify and route",
+  "input_tokens": 409,
+  "output_tokens": 834,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "ccdd7819-fdb3-4b4b-a9f2-c5844f50ee26",
+  "event_time": "2026-06-09 17:57:35",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "Go gRPC interface changes - what's modified, backward compatibility concerns, test adequacy? <diff>",
+  "input_tokens": 164,
+  "output_tokens": 466,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "30de9040-1d84-4eea-8029-1fdfe0d65ee7",
+  "event_time": "2026-06-09 00:21:49",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "trying to extract fields from cloudwatch logs. need timestamp, request_id, error_code, and error_msg. can u write a grok pattern? sample: <log_sample>",
+  "input_tokens": 319,
+  "output_tokens": 750,
+  "latent_pattern": "log_regex"
+ },
+ {
+  "request_id": "3259b693-29b9-4b32-bbe1-d96343e179c5",
+  "event_time": "2026-06-08 02:35:49",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "I'm auditing our backups for a right-to-be-forgotten case. We have daily snapshots going back 6 months. How long should we retain them after deletion is confirmed?",
+  "input_tokens": 131,
+  "output_tokens": 477,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "26e0c83c-bae2-4ab7-8a41-e497469b6bfe",
+  "event_time": "2026-06-09 15:18:04",
+  "user_email": "yuki.mori@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can you create an RCA from this? Container orchestration platform had a scheduling bug, pods weren't being placed correctly. <pod_events_and_logs>",
+  "input_tokens": 347,
+  "output_tokens": 873,
+  "latent_pattern": "incident_rca"
+ },
+ {
+  "request_id": "5a3f48bc-05f0-4c16-bd62-36b71df4c337",
+  "event_time": "2026-06-07 23:49:17",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Can u pull action items from this budget planning meeting? Need owners and target completion dates. <meeting_notes>",
+  "input_tokens": 292,
+  "output_tokens": 739,
+  "latent_pattern": "meeting_actions"
+ },
+ {
+  "request_id": "cd710d88-958d-4213-a8d4-2930915e494d",
+  "event_time": "2026-06-07 21:14:15",
+  "user_email": "li.chen@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I need to convert 156 pounds to kilograms for a shipping label. What's the conversion?",
+  "input_tokens": 175,
+  "output_tokens": 188,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "906249ba-8028-45ba-a9ab-48445e44059f",
+  "event_time": "2026-06-09 07:19:24",
+  "user_email": "sam.akin@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "route this ticket and give me a summary: <ticket text> - also flag if critical",
+  "input_tokens": 372,
+  "output_tokens": 165,
+  "latent_pattern": "ticket_triage"
+ },
+ {
+  "request_id": "d3abf5cb-e770-4281-bbe4-9d5b299653f4",
+  "event_time": "2026-06-08 13:29:28",
+  "user_email": "chris.doyle@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Quick trivia - who won the Nobel Prize in Physics in 1921?",
+  "input_tokens": 109,
+  "output_tokens": 790,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "b8582bf6-3912-44d6-9103-9b7a37eec497",
+  "event_time": "2026-06-07 02:34:35",
+  "user_email": "max.berg@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Draft a response to a feature request for API webhooks. We're already building this but can't say when. Keep them excited but realistic.",
+  "input_tokens": 381,
+  "output_tokens": 169,
+  "latent_pattern": "support_reply"
+ },
+ {
+  "request_id": "0511852a-ae8b-4c3c-9e5d-6a32dcd49e68",
+  "event_time": "2026-06-09 08:02:12",
+  "user_email": "nina.vogel@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "What's the difference between == and === in JavaScript?",
+  "input_tokens": 131,
+  "output_tokens": 504,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "7a21e984-9493-48fa-a44d-7bc3e4915701",
+  "event_time": "2026-06-08 05:13:24",
+  "user_email": "ivy.tran@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "I have a CCPA deletion request from a California resident. They want all their data removed from our systems. What's the checklist I need to go through before confirming completion?",
+  "input_tokens": 401,
+  "output_tokens": 660,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "faad628d-c7e4-4bef-bcc9-b118c5379b18",
+  "event_time": "2026-06-08 14:24:18",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Hey, need a quick review summary for this Go microservice refactor. What are the main changes and any concerns? <diff>",
+  "input_tokens": 391,
+  "output_tokens": 198,
+  "latent_pattern": "pr_summary"
+ },
+ {
+  "request_id": "281e11d8-f2d1-448f-b10a-06ff3a384e66",
+  "event_time": "2026-06-08 17:05:57",
+  "user_email": "dan.okafor@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "I'm reviewing a GDPR access request and the customer asked for data in a portable format. What format should we use? CSV, JSON, or something else? Any legal requirements?",
+  "input_tokens": 169,
+  "output_tokens": 859,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "81ed7231-7e68-4bee-9bab-c378b389fb7e",
+  "event_time": "2026-06-09 00:23:42",
+  "user_email": "amy.ford@acme-corp.com",
+  "endpoint_name": "databricks-claude-haiku-4-5",
+  "prompt": "Draft a privacy-review summary for our new mobile app. It uses geolocation, contacts, and push notifications. What GDPR/CCPA risks should we flag?",
+  "input_tokens": 130,
+  "output_tokens": 879,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "be661b7e-a9e7-4eeb-8aeb-27c4a12a967b",
+  "event_time": "2026-06-10 03:17:04",
+  "user_email": "ken.ito@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "CPRA request: customer wants to correct inaccurate data in our system. They say their address is wrong. What's the process for handling correction requests vs. deletion requests?",
+  "input_tokens": 368,
+  "output_tokens": 584,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "048571d3-3557-4a1f-9390-12807b0504e3",
+  "event_time": "2026-06-07 17:07:29",
+  "user_email": "kate.olson@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Quick question about Python - how do I read a JSON file and parse it?",
+  "input_tokens": 177,
+  "output_tokens": 600,
+  "latent_pattern": "noise"
+ },
+ {
+  "request_id": "3e414f8d-0103-4bd6-9936-4961609aada0",
+  "event_time": "2026-06-09 09:07:37",
+  "user_email": "vic.osei@acme-corp.com",
+  "endpoint_name": "databricks-claude-sonnet-4-6",
+  "prompt": "We're integrating a new analytics tool. Does it require a Data Processing Agreement under GDPR? How do I check if the vendor is compliant?",
+  "input_tokens": 424,
+  "output_tokens": 898,
+  "latent_pattern": "privacy_dsr"
+ },
+ {
+  "request_id": "b15624b6-3179-4401-8ea4-ffa82f3d72fb",
+  "event_time": "2026-06-07 22:08:50",
+  "user_email": "lucia.rossi@acme-corp.com",
+  "endpoint_name": "databricks-gpt-oss-120b",
+  "prompt": "Summarize this research paper in plain English for non-technical stakeholders. Keep it to 3-4 main takeaways. <paper_pdf_text>",
+  "input_tokens": 186,
+  "output_tokens": 882,
+  "latent_pattern": "doc_summarize"
  }
 ]

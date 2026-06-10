@@ -70,6 +70,91 @@ html, body {
 }
 .header .gen b { color: var(--muted); font-weight: 600; }
 
+/* ----- header controls (window, refresh, identity) ----- */
+.header-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.window-ctl { display: flex; align-items: center; gap: 6px; }
+.window-ctl label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted2);
+}
+.window-ctl select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.window-ctl select:focus { outline: none; border-color: var(--red); }
+.window-note { color: var(--muted2); font-size: 11.5px; margin: 4px 0 0 62px; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.icon-btn:hover { border-color: var(--border-strong); background: var(--panel-hover); }
+.icon-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.icon-btn svg { display: block; }
+.icon-btn.spinning svg { animation: spin 0.8s linear infinite; }
+
+.identity-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px 4px 4px;
+}
+.identity-chip .avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--red), #ff7a5c);
+  color: #fff; font-weight: 700; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.identity-chip .id-email {
+  font-size: 12px; color: var(--muted); max-width: 180px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.id-badge {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 999px;
+}
+.id-badge.obo { background: rgba(0, 179, 120, 0.18); color: var(--green); border: 1px solid rgba(0, 179, 120, 0.4); }
+.id-badge.sp { background: rgba(255, 255, 255, 0.08); color: var(--muted); border: 1px solid var(--border); }
+
+/* ----- toast ----- */
+.toast {
+  position: fixed;
+  top: 18px; left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  background: var(--bg2);
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--green);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 12px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  max-width: 80vw;
+}
+.toast.emerging { border-left-color: #9b8cff; }
+.toast.err { border-left-color: var(--red); }
+
 /* ----- generic section ----- */
 .section { margin-top: 40px; }
 .section > h2 {
@@ -165,6 +250,40 @@ table.patterns tbody tr:hover { background: var(--panel-hover); }
 .badge.prio-high { background: rgba(255, 54, 33, 0.16); color: var(--red); border: 1px solid rgba(255, 54, 33, 0.35); }
 .badge.prio-medium { background: rgba(255, 171, 0, 0.16); color: var(--amber); border: 1px solid rgba(255, 171, 0, 0.35); }
 .badge.prio-low { background: rgba(255, 255, 255, 0.08); color: var(--muted); border: 1px solid var(--border); }
+.badge.emerging {
+  background: rgba(155, 140, 255, 0.16);
+  color: #b6abff;
+  border: 1px solid rgba(155, 140, 255, 0.4);
+  margin-left: 6px;
+}
+
+/* ----- gateway coverage ----- */
+.coverage .dot {
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  margin-right: 8px; vertical-align: middle;
+}
+.coverage .dot.on { background: var(--green); box-shadow: 0 0 6px rgba(0, 179, 120, 0.7); }
+.coverage .dot.off { background: var(--muted2); }
+.coverage code.tbl {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px; color: #cfe0e2;
+}
+.muted-txt { color: var(--muted2); }
+
+/* ----- inject result ----- */
+.inject-result { display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; }
+.inject-result .note { font-size: 12px; }
+.hint-chip {
+  align-self: flex-start;
+  background: rgba(255, 171, 0, 0.14);
+  color: var(--amber);
+  border: 1px solid rgba(255, 171, 0, 0.35);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.skill.is-emerging { border-color: rgba(155, 140, 255, 0.4); }
 
 /* ----- skill cards ----- */
 .skill-grid {
@@ -327,4 +446,26 @@ pre.code {
   .skill-grid { grid-template-columns: 1fr; }
   .ba-cols, .bench-results, .bench .params-grid { grid-template-columns: 1fr; }
   .header .gen { display: none; }
+  .header { flex-wrap: wrap; }
+  .header-controls { margin-left: 0; flex-wrap: wrap; }
+  .identity-chip .id-email { max-width: 120px; }
+  .window-note { margin-left: 0; }
 }
+
+/* ---- refresh progress banner ---- */
+.progress-banner {
+  display: flex; align-items: center; gap: 12px;
+  margin: 14px 0 0; padding: 12px 18px;
+  background: linear-gradient(90deg, rgba(255,54,32,0.10), rgba(255,171,0,0.08));
+  border: 1px solid rgba(255,54,32,0.35); border-radius: 12px;
+  font-size: 14px;
+}
+.progress-banner[hidden] { display: none; }
+.pb-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.25); border-top-color: #FF3620;
+  animation: spin 0.8s linear infinite; flex: none;
+}
+.pb-text { font-weight: 600; }
+.pb-elapsed { font-variant-numeric: tabular-nums; opacity: 0.9; font-weight: 600; }
+.pb-note { opacity: 0.55; font-size: 12.5px; }

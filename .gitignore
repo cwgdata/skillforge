@@ -9,3 +9,4 @@ node_modules/
 # Local deploy config (real workspace values)
 app.local.yaml
 .databricks/
+setup.env

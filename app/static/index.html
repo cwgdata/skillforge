@@ -23,8 +23,41 @@
         <h1>SkillForge</h1>
         <div class="sub">Automatic skill recommendation from AI Gateway usage</div>
       </div>
+      <div class="header-controls">
+        <div class="window-ctl">
+          <label for="windowSel">Window</label>
+          <select id="windowSel">
+            <option value="7">7d</option>
+            <option value="14" selected>14d</option>
+            <option value="30">30d</option>
+            <option value="0">All</option>
+          </select>
+        </div>
+        <button class="icon-btn" id="refreshBtn" title="Re-classify new prompts">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+        <div class="identity-chip" id="identityChip" title="Signed-in identity">
+          <span class="avatar" id="idAvatar">?</span>
+          <span class="id-email" id="idEmail">…</span>
+          <span class="id-badge" id="idBadge"></span>
+        </div>
+      </div>
       <div class="gen" id="genInfo"></div>
     </header>
+
+    <div class="progress-banner" id="refreshProgress" hidden>
+      <span class="pb-spinner" aria-hidden="true"></span>
+      <span class="pb-text">Re-classifying prompts through FMAPI&hellip;</span>
+      <span class="pb-elapsed" id="pbElapsed">0:00</span>
+      <span class="pb-note">large backlogs can take a few minutes</span>
+    </div>
+    <div class="window-note" id="windowNote">Window applies to usage charts &amp; refresh scaling.</div>
+
+    <!-- toast -->
+    <div id="toast" class="toast hidden"></div>
 
     <!-- Pending state -->
     <div id="pending" class="card pending hidden">
@@ -77,6 +110,39 @@
       <section class="section">
         <h2>Recommended Skills</h2>
         <div class="skill-grid" id="skillGrid"></div>
+      </section>
+
+      <!-- Gateway coverage -->
+      <section class="section">
+        <h2>Gateway Coverage</h2>
+        <p class="hint" id="coverageBanner">Scanning serving endpoints…</p>
+        <div class="card">
+          <table class="patterns coverage">
+            <thead>
+              <tr><th>Endpoint</th><th>Type</th><th>State</th><th>Inference table</th></tr>
+            </thead>
+            <tbody id="coverageRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Inject prompts -->
+      <section class="section">
+        <h2>Inject Prompts</h2>
+        <p class="hint">Fire prompts through the AI Gateway so they land in the real inference feed, and record them for re-classification.</p>
+        <div class="card bench">
+          <div>
+            <label for="injectText">Prompts</label>
+            <textarea id="injectText" placeholder="One prompt per line…"></textarea>
+          </div>
+          <div>
+            <label for="injectEmail">Attribute to user email (optional)</label>
+            <input id="injectEmail" placeholder="alex@acme-corp.com" />
+          </div>
+          <button class="btn" id="injectRun">Send</button>
+          <div id="injectError" class="error-banner hidden"></div>
+          <div id="injectOut"></div>
+        </div>
       </section>
 
       <!-- Test bench -->

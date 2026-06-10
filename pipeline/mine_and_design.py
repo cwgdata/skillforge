@@ -8,6 +8,7 @@ NOTE: `latent_pattern` in the source data is ground truth used ONLY for the
 final purity sanity check — never for clustering.
 """
 import json
+import os
 import math
 import sys
 from collections import Counter
@@ -21,7 +22,7 @@ DATA_PATH = str(_ROOT / "app" / "data" / "gateway_usage.json")
 RESULTS_PATH = str(_ROOT / "app" / "data" / "results.json")
 SONNET = "databricks-claude-sonnet-4-6"
 HAIKU = "databricks-claude-haiku-4-5"
-WINDOW_DAYS = 14
+WINDOW_DAYS = int(os.environ.get("SKILLFORGE_WINDOW_DAYS", "14"))
 SAVINGS_PCT = 30  # estimated boilerplate input-token savings from templating
 
 
@@ -252,6 +253,17 @@ def main():
             dropped_idxs.extend(p["_indices"])
     unclustered = sorted(set(unclustered) | set(dropped_idxs))
     patterns = [dict(p, id=f"p{i+1}") for i, p in enumerate(kept)]
+    # Persist per-prompt assignments so the app's incremental refresh knows
+    # which prompts are already covered (keyed by sha1 of prompt text).
+    import hashlib
+    assignments = {}
+    for p in patterns:
+        for i in p["_indices"]:
+            h = hashlib.sha1(rows[i]["prompt"].encode()).hexdigest()
+            assignments[h] = p["id"]
+    with open(str(_ROOT / "app" / "data" / "assignments.json"), "w") as f:
+        json.dump(assignments, f)
+    log(f"[write] assignments.json ({len(assignments)} prompts)")
     for p in patterns:
         log(f"  {p['id']} {p['name']}: {p['prompt_count']} prompts, "
             f"{p['user_count']} users, purity {p['purity_pct']}% ({p['dominant_latent']})")
@@ -295,7 +307,7 @@ def main():
 
     results = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "source": {"table": f"{CATALOG}.{SCHEMA}.gateway_usage", "rows": n,
+        "source": {"table": os.environ.get("SKILLFORGE_SOURCE_TABLE", f"{CATALOG}.{SCHEMA}.gateway_usage"), "rows": n,
                    "users": len(users_all), "window_days": WINDOW_DAYS},
         "overview": {
             "total_prompts": n,
