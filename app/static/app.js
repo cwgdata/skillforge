@@ -217,10 +217,14 @@ async function loadCoverage() {
       `<td><div class="pname">${esc(e.name)}</div></td>` +
       `<td class="pdesc">${esc(e.endpoint_type || "—")}</td>` +
       `<td class="pdesc">${esc(e.state || "—")}</td>` +
+      `<td class="pdesc">${e.tokens_7d ? fmt(e.tokens_7d) : "—"}</td>` +
       `<td>` +
       (on
-        ? `<span class="dot on"></span><code class="tbl">${esc(e.inference_table)}</code>`
-        : `<span class="dot off"></span><span class="muted-txt">no payload capture</span>`) +
+        ? `<span class="dot on"></span><code class="tbl">${esc(e.inference_table)}</code>` +
+          (e.plane === "v2" ? `<span class="plane-badge">V2</span>` : (e.plane === "legacy" ? `<span class="plane-badge legacy">LEGACY</span>` : ""))
+        : `<span class="dot off"></span><span class="muted-txt">no payload capture</span> ` +
+          `<a class="mini-link" href="${esc(e.gateway_page || "#")}" target="_blank" rel="noopener" ` +
+          `title="Payload logging for Unity AI Gateway is UI-configured (Beta). Opens this endpoint's Gateway page — use 'Inference table: Set up' with an external-storage catalog (e.g. skillforge_inference.feeds).">Create…</a>`) +
       `</td>` +
       `<td>` +
       (on

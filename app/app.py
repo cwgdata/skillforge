@@ -57,7 +57,9 @@ WAREHOUSE_ID = os.environ.get("DATABRICKS_WAREHOUSE_ID", "")
 CATALOG = os.environ.get("SKILLFORGE_CATALOG", "main")
 SCHEMA = os.environ.get("SKILLFORGE_SCHEMA", "skillforge")
 # Live serving-endpoint inference table for the haiku gateway feed (payload mode).
-INFERENCE_TABLE = f"{CATALOG}.{SCHEMA}.fmapi_haiku_payload"
+INFERENCE_TABLE = os.environ.get(
+    "SKILLFORGE_INFERENCE_TABLE", f"{CATALOG}.{SCHEMA}.fmapi_haiku_payload"
+)
 INJECTED_TABLE = f"{CATALOG}.{SCHEMA}.injected_prompts"
 MINING_TABLE = f"{CATALOG}.{SCHEMA}.mining_config"
 # Per-user runtime overlay (results_doc / assignments_doc). The baseline
@@ -907,7 +909,45 @@ def endpoints_scan(request: Request):
             }
         )
     # configured (inference_table set) first, then alphabetical
-    out.sort(key=lambda e: (e["inference_table"] is None, e["name"] or ""))
+    # Unity AI Gateway (V2) plane: the authoritative inference-table linkage +
+    # token volume live in system.ai_gateway.usage. Legacy per-endpoint config
+    # (above) does NOT capture gateway-subdomain traffic, so V2 wins when present.
+    try:
+        # system.ai_gateway.usage is METASTORE-wide; shared FMAPI endpoint names
+        # collide across workspaces, so filter to this workspace (id = the
+        # gateway URL subdomain) or another workspace's config/tokens leak in.
+        ws_id = AI_GATEWAY_URL.split("//")[-1].split(".")[0] if AI_GATEWAY_URL else ""
+        v2rows = run_sql(
+            "SELECT endpoint_name, max(endpoint_metadata.inference_table), "
+            "sum(total_tokens) FROM system.ai_gateway.usage "
+            f"WHERE workspace_id = '{ws_id}' "
+            "AND event_time > now() - INTERVAL 7 DAYS GROUP BY endpoint_name",
+            request=request,
+        )
+        v2 = {r[0]: {"table": r[1], "tokens": int(r[2] or 0)} for r in v2rows if r and r[0]}
+    except Exception:  # noqa: BLE001 — system table may be unreadable for this principal
+        v2 = {}
+    # system.ai_gateway.usage lags ~1-2h, so a freshly enabled V2 table won't
+    # surface there yet. Bridge: if SKILLFORGE_INFERENCE_TABLE is configured and
+    # its table prefix matches an endpoint name, attribute it directly.
+    cfg_tbl = INFERENCE_TABLE.replace("`", "")
+    cfg_ep = cfg_tbl.rsplit(".", 1)[-1].removesuffix("_payload") if cfg_tbl else ""
+    for ep in out:
+        info = v2.get(ep["name"]) or {}
+        ep["tokens_7d"] = info.get("tokens") or 0
+        if info.get("table"):
+            ep["inference_table"] = info["table"]
+            ep["plane"] = "v2"
+        elif ep["name"] == cfg_ep:
+            ep["inference_table"] = cfg_tbl
+            ep["plane"] = "v2"
+        elif ep["inference_table"]:
+            ep["plane"] = "legacy"
+        else:
+            ep["plane"] = None
+        ep["gateway_page"] = f"{WORKSPACE_HOST}/ml/ai-gateway/{ep['name']}"
+
+    out.sort(key=lambda e: (e["inference_table"] is None, -(e.get("tokens_7d") or 0), e["name"] or ""))
     payload = {
         "endpoints": out,
         "configured": sum(1 for e in out if e["inference_table"]),

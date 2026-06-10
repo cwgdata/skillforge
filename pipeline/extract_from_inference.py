@@ -24,12 +24,21 @@ MAPPING_TABLE = f"{CATALOG}.{SCHEMA}.gateway_usage"
 
 
 def main():
-    rows = run_sql(f"""
-        SELECT request_id, request, request_time
-          FROM {PAYLOAD_TABLE}
-         WHERE status_code = 200
-         ORDER BY request_time
-    """)
+    # V2 (Unity AI Gateway) payload tables use event_time; legacy used request_time.
+    try:
+        rows = run_sql(f"""
+            SELECT request_id, request, event_time
+              FROM {PAYLOAD_TABLE}
+             WHERE status_code = 200
+             ORDER BY event_time
+        """)
+    except Exception:
+        rows = run_sql(f"""
+            SELECT request_id, request, request_time
+              FROM {PAYLOAD_TABLE}
+             WHERE status_code = 200
+             ORDER BY request_time
+        """)
     print(f"{len(rows)} payload rows in {PAYLOAD_TABLE}")
 
     # Extract the last user-message content from each request payload.
