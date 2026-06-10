@@ -11,17 +11,35 @@
   <link rel="stylesheet" href="/app.css" />
 </head>
 <body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#ff3621" stroke-width="6" stroke-linejoin="round"/>
+          <polygon points="50,26 71,38 71,62 50,74 29,62 29,38" fill="#ff3621" opacity="0.18"/>
+          <path d="M50 30 L50 70 M34 42 L66 58 M66 42 L34 58" stroke="#ff3621" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div class="brand-name">SkillForge</div>
+          <div class="brand-sub">AI Gateway mining</div>
+        </div>
+      </div>
+      <nav class="side-nav" id="sideNav">
+        <a href="#sec-overview" class="nav-item active">Overview</a>
+        <a href="#sec-patterns" class="nav-item">Patterns</a>
+        <a href="#sec-skills" class="nav-item">Skills</a>
+        <a href="#sec-coverage" class="nav-item">Gateway Coverage</a>
+        <a href="#sec-inject" class="nav-item">Inject Prompts</a>
+        <a href="#sec-bench" class="nav-item">Test Bench</a>
+      </nav>
+      <div class="side-foot">FMAPI &middot; Unity Catalog &middot; AI Gateway</div>
+    </aside>
   <div class="wrap">
     <!-- Header -->
     <header class="header">
-      <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#ff3621" stroke-width="6" stroke-linejoin="round"/>
-        <polygon points="50,26 71,38 71,62 50,74 29,62 29,38" fill="#ff3621" opacity="0.18"/>
-        <path d="M50 30 L50 70 M34 42 L66 58 M66 42 L34 58" stroke="#ff3621" stroke-width="5" stroke-linecap="round"/>
-      </svg>
       <div>
-        <h1>SkillForge</h1>
-        <div class="sub">Automatic skill recommendation from AI Gateway usage</div>
+        <h1 class="page-title">Skill Recommendation Engine</h1>
+        <div class="sub">Common patterns mined from AI Gateway usage, consolidated into skills</div>
       </div>
       <div class="header-controls">
         <div class="window-ctl">
@@ -50,8 +68,13 @@
 
     <div class="progress-banner" id="refreshProgress" hidden>
       <span class="pb-spinner" aria-hidden="true"></span>
-      <span class="pb-text">Re-classifying prompts through FMAPI&hellip;</span>
-      <span class="pb-elapsed" id="pbElapsed">0:00</span>
+      <div class="pb-main">
+        <div class="pb-line">
+          <span class="pb-text" id="pbText">Re-classifying prompts through FMAPI&hellip;</span>
+          <span class="pb-elapsed" id="pbElapsed">0:00</span>
+        </div>
+        <div class="pb-bar" id="pbBar"><div class="pb-fill" id="pbFill"></div></div>
+      </div>
       <span class="pb-note">large backlogs can take a few minutes</span>
     </div>
     <div class="window-note" id="windowNote">Window applies to usage charts &amp; refresh scaling.</div>
@@ -70,13 +93,13 @@
     <div id="dashboard" class="hidden">
 
       <!-- KPIs -->
-      <section class="section" style="margin-top:26px">
+      <section class="section" id="sec-overview" style="margin-top:26px">
         <div class="kpis" id="kpis"></div>
       </section>
 
       <!-- Charts -->
-      <section class="section">
-        <h2>Usage Signal</h2>
+      <section class="section" id="sec-usage">
+        <h2>Usage Signal <span class="source-pill" id="usageSourcePill" hidden></span></h2>
         <div class="charts">
           <div class="card chart-card">
             <h3>Prompts per day</h3>
@@ -90,7 +113,7 @@
       </section>
 
       <!-- Patterns -->
-      <section class="section">
+      <section class="section" id="sec-patterns">
         <h2>Discovered Patterns</h2>
         <div class="card">
           <table class="patterns">
@@ -107,13 +130,13 @@
       </section>
 
       <!-- Skills -->
-      <section class="section">
+      <section class="section" id="sec-skills">
         <h2>Recommended Skills</h2>
         <div class="skill-grid" id="skillGrid"></div>
       </section>
 
       <!-- Gateway coverage -->
-      <section class="section">
+      <section class="section" id="sec-coverage">
         <h2>Gateway Coverage</h2>
         <p class="hint" id="coverageBanner">Scanning serving endpoints…</p>
         <div class="card">
@@ -127,7 +150,7 @@
       </section>
 
       <!-- Inject prompts -->
-      <section class="section">
+      <section class="section" id="sec-inject">
         <h2>Inject Prompts</h2>
         <p class="hint">Fire prompts through the AI Gateway so they land in the real inference feed, and record them for re-classification.</p>
         <div class="card bench">
@@ -146,7 +169,7 @@
       </section>
 
       <!-- Test bench -->
-      <section class="section">
+      <section class="section" id="sec-bench">
         <h2>Test Bench</h2>
         <p class="hint">Fill a skill's parameters and run it live against the Foundation Model API. Optionally compare against your own raw prompt.</p>
         <div class="card bench">
@@ -166,6 +189,7 @@
       </section>
 
     </div>
+  </div>
   </div>
 
   <script src="/app.js"></script>

@@ -19,6 +19,7 @@ import json
 import os
 import re
 import subprocess
+import threading
 import time
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
@@ -26,7 +27,7 @@ from pathlib import Path
 
 import requests
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -104,6 +105,28 @@ def load_assignments():
 
 def sha1(text):
     return hashlib.sha1((text or "").encode("utf-8")).hexdigest()
+
+
+def atomic_write_json(path, obj):
+    """Write JSON to a temp file then os.replace into place so concurrent
+    readers (load_results/load_assignments) never observe a partial file."""
+    tmp = Path(str(path) + f".tmp.{os.getpid()}.{threading.get_ident()}")
+    with open(tmp, "w") as f:
+        json.dump(obj, f, indent=2)
+    os.replace(tmp, path)
+
+
+class _TokenShim:
+    """Minimal request-like object carrying a captured OBO token in .headers.
+
+    The background refresh thread has no FastAPI Request, so we capture the
+    signed-in user's OBO token before starting the thread and wrap it here.
+    token_candidates()/run_sql()/call_fmapi* all only read
+    request.headers.get('x-forwarded-access-token'), so this is sufficient.
+    """
+
+    def __init__(self, obo_token):
+        self.headers = {"x-forwarded-access-token": obo_token} if obo_token else {}
 
 
 # --------------------------------------------------------------------------- #
@@ -376,8 +399,8 @@ def whoami(request: Request):
     return {"email": email, "auth_mode": "local"}
 
 
-@app.get("/api/usage/stats")
-def usage_stats(window_days: int = 0):
+def _usage_stats_snapshot(window_days, source="snapshot"):
+    """Compute usage stats from the gateway_usage.json snapshot."""
     rows = filter_window(load_usage(), window_days)
     per_day = Counter()
     per_user = Counter()
@@ -392,6 +415,7 @@ def usage_stats(window_days: int = 0):
         tokens_per_endpoint[r.get("endpoint_name", "unknown")] += tok
 
     return {
+        "source": source,
         "prompts_per_day": [{"date": d, "count": c} for d, c in sorted(per_day.items())],
         "prompts_per_user": [{"user": u, "count": c} for u, c in per_user.most_common(10)],
         "tokens_by_endpoint": [
@@ -401,6 +425,77 @@ def usage_stats(window_days: int = 0):
         "total_rows": len(rows),
         "window_days": window_days,
     }
+
+
+# UC usage stats are cached in-process for 30s, keyed by window_days.
+_UC_STATS_CACHE = {}  # window_days -> {"ts": float, "data": dict}
+USAGE_TABLE = f"{CATALOG}.{SCHEMA}.gateway_usage"
+
+
+def _usage_stats_uc(window_days, request):
+    """Compute usage stats live from the {CATALOG}.{SCHEMA}.gateway_usage UC
+    table. The window is relative to MAX(event_time) in the table (matching the
+    snapshot's data-relative semantics). Raises on any failure (caller falls
+    back to the snapshot)."""
+    # Window filter expressed in SQL, relative to MAX(event_time).
+    if window_days and window_days > 0:
+        where = (
+            f"WHERE event_time >= ("
+            f"SELECT MAX(event_time) - INTERVAL {int(window_days)} DAYS FROM {USAGE_TABLE})"
+        )
+    else:
+        where = ""
+
+    per_day_rows = run_sql(
+        f"SELECT CAST(event_time AS DATE) AS d, COUNT(*) AS c "
+        f"FROM {USAGE_TABLE} {where} GROUP BY 1 ORDER BY 1",
+        request=request,
+    )
+    per_user_rows = run_sql(
+        f"SELECT user_email, COUNT(*) AS c FROM {USAGE_TABLE} {where} "
+        f"GROUP BY user_email ORDER BY c DESC LIMIT 10",
+        request=request,
+    )
+    tok_rows = run_sql(
+        f"SELECT endpoint_name, "
+        f"SUM(COALESCE(input_tokens,0) + COALESCE(output_tokens,0)) AS t "
+        f"FROM {USAGE_TABLE} {where} GROUP BY endpoint_name ORDER BY t DESC",
+        request=request,
+    )
+    total_rows = run_sql(f"SELECT COUNT(*) FROM {USAGE_TABLE} {where}", request=request)
+    total = int(total_rows[0][0]) if total_rows and total_rows[0] else 0
+
+    return {
+        "source": "uc",
+        "prompts_per_day": [
+            {"date": str(r[0]), "count": int(r[1] or 0)} for r in per_day_rows
+        ],
+        "prompts_per_user": [
+            {"user": r[0] or "unknown", "count": int(r[1] or 0)} for r in per_user_rows
+        ],
+        "tokens_by_endpoint": [
+            {"endpoint": r[0] or "unknown", "tokens": int(r[1] or 0)} for r in tok_rows
+        ],
+        "total_rows": total,
+        "window_days": window_days,
+    }
+
+
+@app.get("/api/usage/stats")
+def usage_stats(request: Request, window_days: int = 0, source: str = "snapshot"):
+    if source != "uc":
+        return _usage_stats_snapshot(window_days)
+
+    now = time.time()
+    cached = _UC_STATS_CACHE.get(window_days)
+    if cached and (now - cached["ts"]) < 30:
+        return cached["data"]
+    try:
+        data = _usage_stats_uc(window_days, request)
+        _UC_STATS_CACHE[window_days] = {"ts": now, "data": data}
+        return data
+    except Exception:  # noqa: BLE001 — fall back to the snapshot computation
+        return _usage_stats_snapshot(window_days, source="snapshot_fallback")
 
 
 # --------------------------------------------------------------------------- #
@@ -693,31 +788,62 @@ def _classify_batch(patterns, candidates, request):
     return parse_json_loose(text).get("assignments", {})
 
 
-@app.post("/api/refresh")
-def refresh(request: Request, window_days: int = 14):
-    res = load_results()
-    if res.get("status") == "pending":
-        res = {"patterns": [], "skills": [], "summary": {}, "overview": {}}
-    assignments = load_assignments()
+# Background refresh job state. Guarded by _REFRESH_LOCK for all mutation.
+_REFRESH_LOCK = threading.Lock()
+_REFRESH_STATUS = {
+    "state": "idle",  # idle | running | done | error
+    "phase": "",
+    "batches_done": 0,
+    "batches_total": 0,
+    "classified": 0,
+    "total_candidates": 0,
+    "started_at": None,  # epoch seconds
+    "elapsed_s": 0,
+    "result": None,
+    "error": None,
+}
 
-    candidates = _gather_candidates(request, window_days)
-    new_cands = [c for c in candidates if c["h"] not in assignments]
-    if not new_cands:
-        return {
-            "new_prompts": 0,
-            "assigned": {},
-            "unassigned": 0,
-            "new_patterns": [],
-            "new_skills": [],
-            "window_days": window_days,
-        }
 
-    patterns = res.get("patterns", [])
-    # Classify (chunk into batches of 150 to keep the FMAPI prompt manageable).
-    assign_map = {}  # global candidate index -> pattern_id|none
-    BATCH = 150
+def _set_status(**kw):
+    with _REFRESH_LOCK:
+        _REFRESH_STATUS.update(kw)
+
+
+def _run_refresh(token_shim, window_days):
+    """Core re-classification logic. Runs in a daemon thread; updates the
+    module-level _REFRESH_STATUS as it progresses. `token_shim` is a request-like
+    object carrying the captured OBO token (or empty headers → SP fallback)."""
+    request = token_shim
     try:
-        for start in range(0, len(new_cands), BATCH):
+        res = load_results()
+        if res.get("status") == "pending":
+            res = {"patterns": [], "skills": [], "summary": {}, "overview": {}}
+        assignments = load_assignments()
+
+        _set_status(phase="gathering candidates")
+        candidates = _gather_candidates(request, window_days)
+        new_cands = [c for c in candidates if c["h"] not in assignments]
+        _set_status(total_candidates=len(new_cands))
+
+        if not new_cands:
+            result = {
+                "new_prompts": 0,
+                "assigned": {},
+                "unassigned": 0,
+                "new_patterns": [],
+                "new_skills": [],
+                "window_days": window_days,
+            }
+            _set_status(state="done", phase="done", result=result)
+            return
+
+        patterns = res.get("patterns", [])
+        # Classify (chunk into batches of 150 to keep the FMAPI prompt manageable).
+        assign_map = {}  # global candidate index -> pattern_id|none
+        BATCH = 150
+        batches_total = (len(new_cands) + BATCH - 1) // BATCH
+        _set_status(phase="classifying", batches_total=batches_total)
+        for bi, start in enumerate(range(0, len(new_cands), BATCH)):
             chunk = new_cands[start : start + BATCH]
             local = _classify_batch(patterns, chunk, request)
             for k, v in local.items():
@@ -727,125 +853,168 @@ def refresh(request: Request, window_days: int = 14):
                     continue
                 if 0 <= gi < len(new_cands):
                     assign_map[gi] = v
-    except Exception as exc:  # noqa: BLE001
-        return JSONResponse({"error": f"Classification failed: {exc}"}, status_code=502)
+            _set_status(batches_done=bi + 1, classified=min(start + len(chunk), len(new_cands)))
 
-    valid_pids = {p["id"] for p in patterns}
-    assigned_counts = Counter()
-    none_idxs = []
-    for i, c in enumerate(new_cands):
-        pid = assign_map.get(i, "none")
-        if pid in valid_pids:
-            assignments[c["h"]] = pid
-            assigned_counts[pid] += 1
-        else:
-            none_idxs.append(i)
-
-    # Bump matching patterns' prompt_count and per-prompt user sets.
-    for p in patterns:
-        n = assigned_counts.get(p["id"], 0)
-        if n:
-            p["prompt_count"] = (p.get("prompt_count") or 0) + n
-
-    new_patterns_named = []
-    new_skills_named = []
-    absorbed_into_new = 0  # unassigned prompts that became members of a new pattern
-
-    # If enough unassigned, ask sonnet whether they form coherent NEW pattern(s).
-    if len(none_idxs) >= 6:
-        none_prompts = [new_cands[i]["prompt"] for i in none_idxs]
-        numbered = "\n".join(f"{j}. {p[:500]}" for j, p in enumerate(none_prompts))
-        sys = (
-            "You are a prompt-clustering analyst. The following prompts did NOT match "
-            "any existing pattern. Identify whether they form one or more coherent NEW "
-            "usage patterns. Only propose a pattern if at least 6 prompts support it. "
-            'Return ONLY JSON: {"new_patterns": [{"name": "...", "description": "...", '
-            '"prompt_idxs": [int, ...]}]}'
-        )
-        try:
-            text = call_fmapi_chat(
-                [{"role": "system", "content": sys},
-                 {"role": "user", "content": numbered + "\n\nReturn the JSON now."}],
-                request=request, model=FMAPI_SONNET, max_tokens=6000, temperature=0.2,
-            )
-            proposed = parse_json_loose(text).get("new_patterns", [])
-        except Exception:  # noqa: BLE001
-            proposed = []
-
-        existing_ids = [int(p["id"][1:]) for p in patterns if re.match(r"^p\d+$", p.get("id", ""))]
-        next_pid = (max(existing_ids) + 1) if existing_ids else 1
-
-        for np in proposed:
-            idxs = [j for j in (np.get("prompt_idxs") or []) if isinstance(j, int) and 0 <= j < len(none_prompts)]
-            if len(idxs) < 6:
-                continue
-            member_cands = [new_cands[none_idxs[j]] for j in idxs]
-            users = {c["user_email"] for c in member_cands}
-            prompts_txt = [c["prompt"] for c in member_cands]
-            pid = f"p{next_pid}"
-            next_pid += 1
-            pattern = {
-                "id": pid,
-                "name": np.get("name", "Emerging Pattern"),
-                "description": np.get("description", ""),
-                "prompt_count": len(member_cands),
-                "user_count": len(users),
-                "total_tokens": sum(len(p) // 4 + 150 for p in prompts_txt),
-                "example_prompts": prompts_txt[:3],
-                "purity_pct": None,
-                "dominant_latent": "live",
-                "status": "emerging",
-            }
-            patterns.append(pattern)
-            new_patterns_named.append(pattern["name"])
-            absorbed_into_new += len(member_cands)
-            # Record assignments for the members.
-            for c in member_cands:
+        valid_pids = {p["id"] for p in patterns}
+        assigned_counts = Counter()
+        none_idxs = []
+        for i, c in enumerate(new_cands):
+            pid = assign_map.get(i, "none")
+            if pid in valid_pids:
                 assignments[c["h"]] = pid
+                assigned_counts[pid] += 1
+            else:
+                none_idxs.append(i)
 
-            # Design a skill for the new pattern (reuse the existing skill shape).
+        # Bump matching patterns' prompt_count and per-prompt user sets.
+        for p in patterns:
+            n = assigned_counts.get(p["id"], 0)
+            if n:
+                p["prompt_count"] = (p.get("prompt_count") or 0) + n
+
+        new_patterns_named = []
+        new_skills_named = []
+        absorbed_into_new = 0  # unassigned prompts that became members of a new pattern
+
+        # If enough unassigned, ask sonnet whether they form coherent NEW pattern(s).
+        if len(none_idxs) >= 6:
+            _set_status(phase="detecting emerging patterns")
+            none_prompts = [new_cands[i]["prompt"] for i in none_idxs]
+            numbered = "\n".join(f"{j}. {p[:500]}" for j, p in enumerate(none_prompts))
+            sys = (
+                "You are a prompt-clustering analyst. The following prompts did NOT match "
+                "any existing pattern. Identify whether they form one or more coherent NEW "
+                "usage patterns. Only propose a pattern if at least 6 prompts support it. "
+                'Return ONLY JSON: {"new_patterns": [{"name": "...", "description": "...", '
+                '"prompt_idxs": [int, ...]}]}'
+            )
             try:
-                skill = _design_skill(pattern, prompts_txt, len(users), window_days, request, res)
-                if skill:
-                    res.setdefault("skills", []).append(skill)
-                    new_skills_named.append(skill.get("title") or skill.get("name"))
-            except Exception:  # noqa: BLE001 — skill design is best-effort
-                pass
+                text = call_fmapi_chat(
+                    [{"role": "system", "content": sys},
+                     {"role": "user", "content": numbered + "\n\nReturn the JSON now."}],
+                    request=request, model=FMAPI_SONNET, max_tokens=6000, temperature=0.2,
+                )
+                proposed = parse_json_loose(text).get("new_patterns", [])
+            except Exception:  # noqa: BLE001
+                proposed = []
 
-    # Recompute summary consolidation vs new total prompt count.
-    total_prompts = sum(p.get("prompt_count") or 0 for p in patterns)
-    consolidated = total_prompts  # all clustered prompts are "consolidated"
-    summary = res.setdefault("summary", {})
-    sm_overview = res.get("overview", {})
-    base_total = sm_overview.get("total_prompts") or total_prompts
-    grand_total = max(base_total, total_prompts)
-    summary["prompts_consolidated"] = consolidated
-    if grand_total:
-        summary["prompts_consolidated_pct"] = round(100.0 * consolidated / grand_total, 1)
-    summary["skills_recommended"] = len(res.get("skills", []))
+            existing_ids = [int(p["id"][1:]) for p in patterns if re.match(r"^p\d+$", p.get("id", ""))]
+            next_pid = (max(existing_ids) + 1) if existing_ids else 1
 
-    res["patterns"] = patterns
-    res["refreshed_at"] = datetime.utcnow().isoformat() + "Z"
+            for np in proposed:
+                idxs = [j for j in (np.get("prompt_idxs") or []) if isinstance(j, int) and 0 <= j < len(none_prompts)]
+                if len(idxs) < 6:
+                    continue
+                member_cands = [new_cands[none_idxs[j]] for j in idxs]
+                users = {c["user_email"] for c in member_cands}
+                prompts_txt = [c["prompt"] for c in member_cands]
+                pid = f"p{next_pid}"
+                next_pid += 1
+                pattern = {
+                    "id": pid,
+                    "name": np.get("name", "Emerging Pattern"),
+                    "description": np.get("description", ""),
+                    "prompt_count": len(member_cands),
+                    "user_count": len(users),
+                    "total_tokens": sum(len(p) // 4 + 150 for p in prompts_txt),
+                    "example_prompts": prompts_txt[:3],
+                    "purity_pct": None,
+                    "dominant_latent": "live",
+                    "status": "emerging",
+                }
+                patterns.append(pattern)
+                new_patterns_named.append(pattern["name"])
+                absorbed_into_new += len(member_cands)
+                # Record assignments for the members.
+                for c in member_cands:
+                    assignments[c["h"]] = pid
 
-    # Persist results + assignments. NOTE: the Apps container FS is ephemeral —
-    # these writes survive only for the life of the running container (fine for a
-    # demo / live re-classification session).
-    try:
-        with open(RESULTS_PATH, "w") as f:
-            json.dump(res, f, indent=2)
-        with open(ASSIGNMENTS_PATH, "w") as f:
-            json.dump(assignments, f, indent=2)
-    except OSError:
-        pass
+                # Design a skill for the new pattern (reuse the existing skill shape).
+                _set_status(phase="designing skills")
+                try:
+                    skill = _design_skill(pattern, prompts_txt, len(users), window_days, request, res)
+                    if skill:
+                        res.setdefault("skills", []).append(skill)
+                        new_skills_named.append(skill.get("title") or skill.get("name"))
+                except Exception:  # noqa: BLE001 — skill design is best-effort
+                    pass
 
-    return {
-        "new_prompts": len(new_cands),
-        "assigned": dict(assigned_counts),
-        "unassigned": len(none_idxs) - absorbed_into_new,
-        "new_patterns": new_patterns_named,
-        "new_skills": new_skills_named,
-        "window_days": window_days,
-    }
+        # Recompute summary consolidation vs new total prompt count.
+        total_prompts = sum(p.get("prompt_count") or 0 for p in patterns)
+        consolidated = total_prompts  # all clustered prompts are "consolidated"
+        summary = res.setdefault("summary", {})
+        sm_overview = res.get("overview", {})
+        base_total = sm_overview.get("total_prompts") or total_prompts
+        grand_total = max(base_total, total_prompts)
+        summary["prompts_consolidated"] = consolidated
+        if grand_total:
+            summary["prompts_consolidated_pct"] = round(100.0 * consolidated / grand_total, 1)
+        summary["skills_recommended"] = len(res.get("skills", []))
+
+        res["patterns"] = patterns
+        res["refreshed_at"] = datetime.utcnow().isoformat() + "Z"
+
+        # Persist results + assignments via atomic temp-file + os.replace so
+        # concurrent readers never see partial JSON. NOTE: the Apps container FS
+        # is ephemeral — writes survive only for the life of the container.
+        _set_status(phase="persisting")
+        try:
+            atomic_write_json(RESULTS_PATH, res)
+            atomic_write_json(ASSIGNMENTS_PATH, assignments)
+        except OSError:
+            pass
+
+        result = {
+            "new_prompts": len(new_cands),
+            "assigned": dict(assigned_counts),
+            "unassigned": len(none_idxs) - absorbed_into_new,
+            "new_patterns": new_patterns_named,
+            "new_skills": new_skills_named,
+            "window_days": window_days,
+        }
+        _set_status(state="done", phase="done", result=result)
+    except Exception as exc:  # noqa: BLE001 — record failure for the status poller
+        _set_status(state="error", phase="error", error=str(exc)[:400])
+
+
+@app.post("/api/refresh")
+def refresh(request: Request, window_days: int = 14):
+    # Only one refresh at a time.
+    with _REFRESH_LOCK:
+        if _REFRESH_STATUS["state"] == "running":
+            return JSONResponse({"error": "refresh already running"}, status_code=409)
+        job_id = sha1(str(time.time()) + str(threading.get_ident()))[:12]
+        _REFRESH_STATUS.update(
+            {
+                "state": "running",
+                "phase": "starting",
+                "batches_done": 0,
+                "batches_total": 0,
+                "classified": 0,
+                "total_candidates": 0,
+                "started_at": time.time(),
+                "elapsed_s": 0,
+                "result": None,
+                "error": None,
+                "job_id": job_id,
+            }
+        )
+    # Capture the OBO token BEFORE the thread starts — the thread has no Request.
+    obo = request.headers.get("x-forwarded-access-token") if request is not None else None
+    shim = _TokenShim(obo)
+    t = threading.Thread(target=_run_refresh, args=(shim, window_days), daemon=True)
+    t.start()
+    return JSONResponse({"job_id": job_id, "state": "running"}, status_code=202)
+
+
+@app.get("/api/refresh/status")
+def refresh_status():
+    with _REFRESH_LOCK:
+        st = dict(_REFRESH_STATUS)
+    started = st.get("started_at")
+    if started:
+        st["elapsed_s"] = round(time.time() - started, 1)
+    return st
 
 
 def _design_skill(pattern, prompts_txt, users_covered, window_days, request, res):
@@ -911,6 +1080,181 @@ def _design_skill(pattern, prompts_txt, users_covered, window_days, request, res
         "quality_ab": None,
         "status": "emerging",
     }
+
+
+# --------------------------------------------------------------------------- #
+# Skill export
+# --------------------------------------------------------------------------- #
+def _find_skill(skill_id):
+    res = load_results()
+    skills = res.get("skills", []) if isinstance(res, dict) else []
+    return next((s for s in skills if s.get("id") == skill_id), None)
+
+
+def _skill_markdown(skill):
+    """Render a skill as a ready-to-install Claude Code skill markdown doc."""
+    name = skill.get("name") or skill.get("id") or "skill"
+    title = skill.get("title") or name
+    description = skill.get("description") or ""
+    template = skill.get("template") or ""
+    example = skill.get("example_invocation") or ""
+    pattern_name = ""
+    pid = skill.get("pattern_id")
+    if pid:
+        res = load_results()
+        pat = next((p for p in res.get("patterns", []) if p.get("id") == pid), None)
+        if pat:
+            pattern_name = pat.get("name", "")
+
+    lines = []
+    # YAML frontmatter
+    lines.append("---")
+    lines.append(f"name: {name}")
+    # keep description on one line for valid frontmatter
+    one_line_desc = " ".join(description.splitlines()).strip()
+    lines.append(f"description: {one_line_desc}")
+    lines.append("---")
+    lines.append("")
+    lines.append(f"# {title}")
+    lines.append("")
+    lines.append("## When to use")
+    lines.append("")
+    when = description
+    if pattern_name:
+        when = f"{description}\n\nDerived from the usage pattern: **{pattern_name}**."
+    lines.append(when)
+    lines.append("")
+    lines.append("## Template")
+    lines.append("")
+    lines.append("```")
+    lines.append(template)
+    lines.append("```")
+    lines.append("")
+    lines.append("## Parameters")
+    lines.append("")
+    params = skill.get("parameters") or []
+    if params:
+        lines.append("| Name | Description |")
+        lines.append("| --- | --- |")
+        for p in params:
+            pn = str(p.get("name", "")).replace("|", "\\|")
+            pd = " ".join(str(p.get("description", "")).splitlines()).replace("|", "\\|")
+            lines.append(f"| `{pn}` | {pd} |")
+    else:
+        lines.append("_No parameters._")
+    lines.append("")
+    lines.append("## Example")
+    lines.append("")
+    lines.append("```")
+    lines.append(example)
+    lines.append("```")
+    lines.append("")
+    return "\n".join(lines)
+
+
+@app.get("/api/skills/{skill_id}/export")
+def export_skill(skill_id: str, format: str = "markdown"):
+    skill = _find_skill(skill_id)
+    if skill is None:
+        return JSONResponse({"error": f"Skill '{skill_id}' not found."}, status_code=404)
+    name = skill.get("name") or skill.get("id") or "skill"
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-") or "skill"
+    if format == "json":
+        body = json.dumps(skill, indent=2)
+        return Response(
+            content=body,
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="{safe}.json"'},
+        )
+    md = _skill_markdown(skill)
+    return Response(
+        content=md,
+        media_type="text/markdown",
+        headers={"Content-Disposition": f'attachment; filename="{safe}.md"'},
+    )
+
+
+# --------------------------------------------------------------------------- #
+# On-demand quality A/B
+# --------------------------------------------------------------------------- #
+class QualityABRequest(BaseModel):
+    raw_prompt: str | None = None
+
+
+@app.post("/api/skills/{skill_id}/quality_ab")
+def quality_ab(skill_id: str, req: QualityABRequest, request: Request):
+    res = load_results()
+    if not isinstance(res, dict) or res.get("status") == "pending":
+        return JSONResponse({"error": "Engine has not run yet."}, status_code=409)
+    skills = res.get("skills", [])
+    skill = next((s for s in skills if s.get("id") == skill_id), None)
+    if skill is None:
+        return JSONResponse({"error": f"Skill '{skill_id}' not found."}, status_code=404)
+
+    # Raw arm: provided raw_prompt, else the pattern's first example_prompt,
+    # else any example we can find.
+    raw_prompt = (req.raw_prompt or "").strip()
+    if not raw_prompt:
+        pid = skill.get("pattern_id")
+        pat = next((p for p in res.get("patterns", []) if p.get("id") == pid), None)
+        examples = (pat.get("example_prompts") if pat else None) or []
+        if not examples:
+            # fallback: any pattern's example
+            for p in res.get("patterns", []):
+                if p.get("example_prompts"):
+                    examples = p["example_prompts"]
+                    break
+        raw_prompt = examples[0] if examples else (skill.get("example_invocation") or "")
+
+    skill_prompt = skill.get("example_invocation") or skill.get("template") or ""
+
+    try:
+        raw_answer, _ = call_fmapi(
+            raw_prompt, request=request, model=FMAPI_HAIKU, max_tokens=700
+        )
+        skill_answer, _ = call_fmapi(
+            skill_prompt, request=request, model=FMAPI_HAIKU, max_tokens=700
+        )
+        judge_sys = (
+            "You are a strict evaluator of LLM answer quality. Score each of two "
+            "answers on a 1-10 scale considering completeness, structure, and "
+            "actionability (10 = best). Return ONLY JSON of the form "
+            '{"raw_score": <int>, "skill_score": <int>, "rationale": "<one or two '
+            'sentences comparing them>"}.'
+        )
+        judge_user = (
+            f"RAW PROMPT:\n{raw_prompt}\n\nANSWER A (raw):\n{raw_answer}\n\n"
+            f"SKILL PROMPT:\n{skill_prompt}\n\nANSWER B (skill):\n{skill_answer}\n\n"
+            "Score ANSWER A as raw_score and ANSWER B as skill_score. Return the JSON now."
+        )
+        judged = call_fmapi_chat(
+            [{"role": "system", "content": judge_sys},
+             {"role": "user", "content": judge_user}],
+            request=request, model=FMAPI_SONNET, max_tokens=700, temperature=0.2,
+        )
+        verdict = parse_json_loose(judged)
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": f"FMAPI call failed: {exc}"}, status_code=502)
+
+    ab = {
+        "raw_score": verdict.get("raw_score"),
+        "skill_score": verdict.get("skill_score"),
+        "rationale": verdict.get("rationale", ""),
+        "raw_prompt": raw_prompt[:600],
+        "skill_prompt": skill_prompt[:600],
+        "raw_answer": (raw_answer or "")[:600],
+        "skill_answer": (skill_answer or "")[:600],
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+    }
+
+    # Persist into the skill's quality_ab in results.json (atomic write).
+    skill["quality_ab"] = ab
+    try:
+        atomic_write_json(RESULTS_PATH, res)
+    except OSError:
+        pass
+
+    return ab
 
 
 # --------------------------------------------------------------------------- #

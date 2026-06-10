@@ -87,6 +87,7 @@ async function init() {
   renderInject();
   loadCoverage();
   reloadCharts();
+  resumeRefreshIfRunning();
 }
 
 function wireControls() {
@@ -162,64 +163,162 @@ async function loadCoverage() {
   });
 }
 
-// ---- refresh ----
-async function runRefresh() {
+// ---- refresh (background job + status polling) ----
+let REFRESH_POLL = null;
+let REFRESH_ELAPSED = null;
+
+function setRefreshBusy(busy) {
   const btn = $("#refreshBtn");
-  btn.disabled = true;
+  if (!btn) return;
+  btn.disabled = busy;
   const label = btn.querySelector("span");
-  const orig = label ? label.textContent : "Refresh";
-  if (label) label.textContent = "Re-classifying…";
-  btn.classList.add("spinning");
+  if (label) label.textContent = busy ? "Re-classifying…" : "Refresh";
+  btn.classList.toggle("spinning", busy);
+}
+
+function showRefreshBanner() {
   const banner = $("#refreshProgress");
-  const elapsedEl = $("#pbElapsed");
-  const t0 = Date.now();
-  let timer = null;
-  if (banner) {
-    banner.hidden = false;
-    if (elapsedEl) {
-      elapsedEl.textContent = "0:00";
-      timer = setInterval(() => {
-        const s = Math.floor((Date.now() - t0) / 1000);
-        elapsedEl.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
-      }, 1000);
+  if (banner) banner.hidden = false;
+}
+function hideRefreshBanner() {
+  const banner = $("#refreshProgress");
+  if (banner) banner.hidden = true;
+}
+
+function fmtElapsed(s) {
+  s = Math.max(0, Math.floor(s || 0));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+
+// Render the progress banner from a /api/refresh/status payload.
+function renderProgress(st) {
+  const txt = $("#pbText");
+  const bar = $("#pbBar");
+  const fill = $("#pbFill");
+  if (txt) {
+    let line = "Re-classifying prompts through FMAPI…";
+    const phase = st.phase ? st.phase.charAt(0).toUpperCase() + st.phase.slice(1) : "";
+    if (phase) line = phase + "…";
+    if (st.total_candidates) {
+      line = `${phase || "Classifying"} — classified ${fmt(st.classified || 0)}/${fmt(st.total_candidates)}`;
+    }
+    txt.textContent = line;
+  }
+  // percent bar: prefer classified/total, fall back to batch ratio, else indeterminate
+  let pctDone = null;
+  if (st.total_candidates) pctDone = (st.classified || 0) / st.total_candidates;
+  else if (st.batches_total) pctDone = (st.batches_done || 0) / st.batches_total;
+  if (bar && fill) {
+    if (pctDone == null) {
+      bar.classList.add("indeterminate");
+    } else {
+      bar.classList.remove("indeterminate");
+      fill.style.width = Math.max(2, Math.min(100, Math.round(pctDone * 100))) + "%";
     }
   }
+}
+
+function stopRefreshPolling() {
+  if (REFRESH_POLL) { clearInterval(REFRESH_POLL); REFRESH_POLL = null; }
+  if (REFRESH_ELAPSED) { clearInterval(REFRESH_ELAPSED); REFRESH_ELAPSED = null; }
+}
+
+async function refreshDone(st) {
+  stopRefreshPolling();
+  setRefreshBusy(false);
+  hideRefreshBanner();
+  const data = (st && st.result) || {};
+  if (data.new_prompts === 0) {
+    showToast("No new prompts to classify.", "");
+  } else {
+    const bits = [`${fmt(data.new_prompts)} new prompts`];
+    const asgTotal = Object.values(data.assigned || {}).reduce((a, b) => a + b, 0);
+    bits.push(`${fmt(asgTotal)} assigned`);
+    let kind = "";
+    if ((data.new_patterns || []).length) {
+      bits.push(`NEW PATTERN: ${esc(data.new_patterns.join(", "))}`);
+      kind = "emerging";
+    }
+    showToast(bits.join(" — "), kind);
+  }
+  // full re-render from fresh results
+  try {
+    const fresh = await (await fetch("/api/results")).json();
+    if (fresh && fresh.status !== "pending") {
+      RESULTS = fresh;
+      renderKpis(fresh);
+      renderPatterns(fresh);
+      renderSkills(fresh);
+      renderBench(fresh);
+    }
+  } catch (e) { /* ignore */ }
+  reloadCharts();
+}
+
+// Poll /api/refresh/status; drive the banner + completion handling.
+function startRefreshPolling() {
+  setRefreshBusy(true);
+  showRefreshBanner();
+  stopRefreshPolling();
+  const pbElapsed = $("#pbElapsed");
+  const poll = async () => {
+    let st;
+    try {
+      st = await (await fetch("/api/refresh/status")).json();
+    } catch (e) { return; }
+    if (pbElapsed) pbElapsed.textContent = fmtElapsed(st.elapsed_s);
+    if (st.state === "running") {
+      renderProgress(st);
+    } else if (st.state === "done") {
+      refreshDone(st);
+    } else if (st.state === "error") {
+      stopRefreshPolling();
+      setRefreshBusy(false);
+      hideRefreshBanner();
+      showToast("Refresh failed: " + (st.error || "unknown error"), "err");
+    } else {
+      // idle (shouldn't normally happen mid-run) — stop quietly
+      stopRefreshPolling();
+      setRefreshBusy(false);
+      hideRefreshBanner();
+    }
+  };
+  poll();
+  REFRESH_POLL = setInterval(poll, 3000);
+}
+
+async function runRefresh() {
+  setRefreshBusy(true);
+  showRefreshBanner();
+  renderProgress({ phase: "starting" });
   try {
     const resp = await fetch("/api/refresh?window_days=" + currentWindow(), { method: "POST" });
     const data = await resp.json();
-    if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
-
-    if (data.new_prompts === 0) {
-      showToast("No new prompts to classify.", "");
-    } else {
-      const bits = [`${fmt(data.new_prompts)} new prompts`];
-      const asgTotal = Object.values(data.assigned || {}).reduce((a, b) => a + b, 0);
-      bits.push(`${fmt(asgTotal)} assigned`);
-      let kind = "";
-      if ((data.new_patterns || []).length) {
-        bits.push(`NEW PATTERN: ${esc(data.new_patterns.join(", "))}`);
-        kind = "emerging";
-      }
-      showToast(bits.join(" — "), kind);
-      // re-fetch and re-render everything
-      const fresh = await (await fetch("/api/results")).json();
-      if (fresh && fresh.status !== "pending") {
-        RESULTS = fresh;
-        renderKpis(fresh);
-        renderPatterns(fresh);
-        renderSkills(fresh);
-        renderBench(fresh);
-      }
+    if (resp.status === 409) {
+      // already running — just attach to the existing job
+      startRefreshPolling();
+      return;
     }
-    reloadCharts();
+    if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
+    startRefreshPolling();
   } catch (e) {
+    setRefreshBusy(false);
+    hideRefreshBanner();
     showToast("Refresh failed: " + e.message, "err");
-  } finally {
-    btn.disabled = false;
-    if (label) label.textContent = orig;
-    btn.classList.remove("spinning");
-    if (timer) clearInterval(timer);
-    if (banner) banner.hidden = true;
+  }
+}
+
+// On page load: if a refresh is already running, resume the banner + polling.
+async function resumeRefreshIfRunning() {
+  let st;
+  try {
+    st = await (await fetch("/api/refresh/status")).json();
+  } catch (e) { return; }
+  if (st && st.state === "running") {
+    renderProgress(st);
+    const pbElapsed = $("#pbElapsed");
+    if (pbElapsed) pbElapsed.textContent = fmtElapsed(st.elapsed_s);
+    startRefreshPolling();
   }
 }
 
@@ -331,6 +430,11 @@ function renderSkills(res) {
       .map((p) => `<li><code>{${esc(p.name)}}</code> — ${esc(p.description)}</li>`)
       .join("");
 
+    const hasAb = !!s.quality_ab;
+    const abBtn = hasAb
+      ? `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Re-run A/B</button>`
+      : `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Run quality A/B</button>`;
+
     card.innerHTML =
       `<div class="top">
          <div>
@@ -347,22 +451,81 @@ function renderSkills(res) {
            <pre class="code">${esc(s.template)}</pre>
            ${params ? `<div class="kv"><b>Parameters</b></div><ul class="param-list">${params}</ul>` : ""}
            ${s.example_invocation ? `<div class="kv"><b>Example invocation</b></div><pre class="code">${esc(s.example_invocation)}</pre>` : ""}
-           ${beforeAfter(s.quality_ab)}
          </div>
-       </details>`;
+       </details>
+       <div class="ab-slot">${beforeAfter(s.quality_ab)}</div>
+       <div class="skill-footer">
+         ${abBtn}
+         <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="markdown">Export .md</button>
+         <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="json">.json</button>
+       </div>`;
     grid.appendChild(card);
   });
+
+  // wire export (download) + quality A/B buttons
+  grid.querySelectorAll("[data-export]").forEach((b) => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.export;
+      const fmt = b.dataset.fmt || "markdown";
+      location.href = `/api/skills/${encodeURIComponent(id)}/export?format=${fmt}`;
+    });
+  });
+  grid.querySelectorAll(".ab-btn").forEach((b) => {
+    b.addEventListener("click", () => runQualityAb(b.dataset.skill, b));
+  });
+}
+
+async function runQualityAb(skillId, btn) {
+  if (!btn) return;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span>Running A/B…`;
+  try {
+    const resp = await fetch(`/api/skills/${encodeURIComponent(skillId)}/quality_ab`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
+    // refetch results and re-render so the card shows the Before/After panel
+    const fresh = await (await fetch("/api/results")).json();
+    if (fresh && fresh.status !== "pending") {
+      RESULTS = fresh;
+      renderSkills(fresh);
+    }
+    showToast("Quality A/B complete.", "");
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = orig;
+    showToast("Quality A/B failed: " + e.message, "err");
+  }
 }
 
 // ---- charts ----
 let CHART_DAY = null;
 let CHART_EP = null;
 
+function setUsageSourcePill(source) {
+  const pill = $("#usageSourcePill");
+  if (!pill) return;
+  if (source === "uc") {
+    pill.textContent = "LIVE UC";
+    pill.className = "source-pill live";
+  } else {
+    pill.textContent = "SNAPSHOT";
+    pill.className = "source-pill snap";
+  }
+  pill.hidden = false;
+}
+
 async function reloadCharts() {
   let stats;
   try {
-    stats = await (await fetch("/api/usage/stats?window_days=" + currentWindow())).json();
+    // Prefer live Unity Catalog stats; the server falls back to the snapshot.
+    stats = await (await fetch("/api/usage/stats?source=uc&window_days=" + currentWindow())).json();
   } catch (e) { return; }
+  setUsageSourcePill(stats.source);
 
   if (CHART_DAY) { CHART_DAY.destroy(); CHART_DAY = null; }
   if (CHART_EP) { CHART_EP.destroy(); CHART_EP = null; }
@@ -596,3 +759,36 @@ async function runInject() {
 }
 
 init();
+
+
+// ---- sidebar nav (scrollspy + smooth scroll) ----
+function wireSidebar() {
+  const nav = document.getElementById("sideNav");
+  if (!nav || nav.dataset.wired) return;
+  nav.dataset.wired = "1";
+  const items = Array.from(nav.querySelectorAll(".nav-item"));
+  items.forEach((it) => {
+    it.addEventListener("click", (e) => {
+      const target = document.querySelector(it.getAttribute("href"));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+  // Overview nav stays active across both the KPI and usage sections.
+  const map = { "sec-usage": "#sec-overview" };
+  const obs = new IntersectionObserver(
+    (entries) => {
+      const vis = entries.filter((en) => en.isIntersecting)
+        .sort((x, y) => y.intersectionRatio - x.intersectionRatio)[0];
+      if (!vis) return;
+      const id = vis.target.id;
+      const href = map[id] || "#" + id;
+      items.forEach((it) => it.classList.toggle("active", it.getAttribute("href") === href));
+    },
+    { rootMargin: "-20% 0px -55% 0px", threshold: [0.05, 0.25, 0.5] }
+  );
+  document.querySelectorAll("section.section[id]").forEach((s) => obs.observe(s));
+}
+document.addEventListener("DOMContentLoaded", wireSidebar);
