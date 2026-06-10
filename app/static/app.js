@@ -141,14 +141,23 @@ async function loadCoverage() {
     $("#coverageBanner").textContent = "Endpoint scan failed: " + data.error;
     return;
   }
+  // mine/don't-mine state for each discovered table (UC-backed)
+  let mining = {};
+  try {
+    const mc = await (await fetch("/api/mining/config")).json();
+    (mc.tables || []).forEach((m) => { mining[m.table] = m.enabled; });
+  } catch (e) { /* default everything to enabled */ }
+
   const eps = data.endpoints || [];
+  const mined = eps.filter((e) => e.inference_table && mining[e.inference_table] !== false).length;
   $("#coverageBanner").innerHTML =
     `<b>${fmt(data.configured)}</b> of <b>${fmt(data.total)}</b> endpoints have inference tables — ` +
-    `SkillForge can mine each of these feeds.`;
+    `<b>${fmt(mined)}</b> feed${mined === 1 ? "" : "s"} enabled for mining.`;
   const tb = $("#coverageRows");
   tb.innerHTML = "";
   eps.forEach((e) => {
     const on = !!e.inference_table;
+    const enabled = on && mining[e.inference_table] !== false;
     const tr = el("tr");
     tr.innerHTML =
       `<td><div class="pname">${esc(e.name)}</div></td>` +
@@ -158,8 +167,36 @@ async function loadCoverage() {
       (on
         ? `<span class="dot on"></span><code class="tbl">${esc(e.inference_table)}</code>`
         : `<span class="dot off"></span><span class="muted-txt">no payload capture</span>`) +
+      `</td>` +
+      `<td>` +
+      (on
+        ? `<label class="switch" title="Mine this feed on Refresh"><input type="checkbox" data-table="${esc(e.inference_table)}" ${enabled ? "checked" : ""}/><span class="slider"></span></label>`
+        : `<span class="muted-txt">—</span>`) +
       `</td>`;
     tb.appendChild(tr);
+  });
+  tb.querySelectorAll('input[type="checkbox"][data-table]').forEach((cb) => {
+    cb.addEventListener("change", async () => {
+      const table = cb.dataset.table;
+      const want = cb.checked;
+      cb.disabled = true;
+      try {
+        const resp = await fetch("/api/mining/toggle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ table: table, enabled: want }),
+        });
+        const out = await resp.json();
+        if (!resp.ok || out.error) throw new Error(out.error || "HTTP " + resp.status);
+        showToast(`${want ? "Mining enabled" : "Mining disabled"} for ${table}`, want ? "good" : "");
+        loadCoverage();
+      } catch (err) {
+        cb.checked = !want; // revert
+        showToast("Toggle failed: " + err.message, "bad");
+      } finally {
+        cb.disabled = false;
+      }
+    });
   });
 }
 

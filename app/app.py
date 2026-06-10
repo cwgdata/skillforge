@@ -59,6 +59,7 @@ SCHEMA = os.environ.get("SKILLFORGE_SCHEMA", "skillforge")
 # Live serving-endpoint inference table for the haiku gateway feed (payload mode).
 INFERENCE_TABLE = f"{CATALOG}.{SCHEMA}.fmapi_haiku_payload"
 INJECTED_TABLE = f"{CATALOG}.{SCHEMA}.injected_prompts"
+MINING_TABLE = f"{CATALOG}.{SCHEMA}.mining_config"
 
 app = FastAPI(title="SkillForge")
 
@@ -602,6 +603,38 @@ def inject(req: InjectRequest, request: Request):
 # --------------------------------------------------------------------------- #
 # Endpoint / inference-table scan (cached 60s)
 # --------------------------------------------------------------------------- #
+def _mining_overrides(request):
+    """table_name -> enabled from the UC mining_config table ({} on failure)."""
+    try:
+        rows = run_sql(
+            f"SELECT table_name, enabled FROM {MINING_TABLE}", request=request
+        )
+        return {r[0]: str(r[1]).lower() == "true" for r in rows if r and r[0]}
+    except Exception:  # noqa: BLE001 — table may not exist yet
+        return {}
+
+
+def _enabled_mining_tables(request):
+    """Inference tables refresh should mine: discovered tables (via the scan)
+    merged with mining_config overrides. Default for a discovered table with no
+    override is ENABLED. Falls back to the built-in table if the scan fails."""
+    discovered = []
+    try:
+        payload = endpoints_scan(request)
+        if isinstance(payload, dict):
+            discovered = [
+                e["inference_table"]
+                for e in payload.get("endpoints", [])
+                if e.get("inference_table")
+            ]
+    except Exception:  # noqa: BLE001
+        pass
+    if not discovered:
+        discovered = [INFERENCE_TABLE]
+    overrides = _mining_overrides(request)
+    return [tbl for tbl in discovered if overrides.get(tbl, True)]
+
+
 _SCAN_CACHE = {"ts": 0.0, "data": None}
 
 
@@ -685,6 +718,53 @@ def endpoints_scan(request: Request):
     return payload
 
 
+@app.get("/api/mining/config")
+def mining_config(request: Request):
+    """Discovered inference tables with their mine-or-not state."""
+    payload = endpoints_scan(request)
+    if not isinstance(payload, dict):
+        return payload  # propagate scan error response
+    overrides = _mining_overrides(request)
+    tables = [
+        {
+            "endpoint": e["name"],
+            "table": e["inference_table"],
+            "enabled": overrides.get(e["inference_table"], True),
+        }
+        for e in payload.get("endpoints", [])
+        if e.get("inference_table")
+    ]
+    return {"tables": tables}
+
+
+class MiningToggle(BaseModel):
+    table: str
+    enabled: bool
+
+
+@app.post("/api/mining/toggle")
+def mining_toggle(req: MiningToggle, request: Request):
+    """Persist a mine/don't-mine decision for an inference table (UC-backed)."""
+    table = req.table.strip()
+    # Only accept tables we actually discovered on serving endpoints.
+    payload = endpoints_scan(request)
+    known = set()
+    if isinstance(payload, dict):
+        known = {e["inference_table"] for e in payload.get("endpoints", []) if e.get("inference_table")}
+    if table not in known:
+        return JSONResponse({"error": f"Unknown inference table '{table}'."}, status_code=404)
+    who = (request_identity(request).get("email") or "app").replace("'", "")
+    try:
+        run_sql(f"DELETE FROM {MINING_TABLE} WHERE table_name = {sql_str(table)}", request=request)
+        run_sql(
+            f"INSERT INTO {MINING_TABLE} VALUES ({sql_str(table)}, {str(req.enabled).upper()}, now(), {sql_str(who)})",
+            request=request,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": f"Could not persist toggle: {exc}"}, status_code=502)
+    return {"table": table, "enabled": req.enabled, "updated_by": who}
+
+
 # --------------------------------------------------------------------------- #
 # Refresh — incremental re-classification
 # --------------------------------------------------------------------------- #
@@ -730,10 +810,12 @@ def _gather_candidates(request, window_days):
     except Exception:  # noqa: BLE001 — table may not exist yet
         pass
 
-    # (iii) live inference table — parse request JSON, take last user-role message
-    try:
+    # (iii) live inference tables — every discovered table not toggled off in
+    # mining_config; parse request JSON, take last user-role message
+    for _mine_tbl in _enabled_mining_tables(request):
+      try:
         rows = run_sql(
-            f"SELECT request, response FROM {INFERENCE_TABLE} WHERE status_code = 200",
+            f"SELECT request, response FROM {_mine_tbl} WHERE status_code = 200",
             request=request,
         )
         for row in rows:
@@ -759,8 +841,8 @@ def _gather_candidates(request, window_days):
             h = sha1(p)
             if h not in seen:
                 seen[h] = {"prompt": p, "user_email": "inference-table", "h": h}
-    except Exception:  # noqa: BLE001 — table may not exist yet → skip source iii
-        pass
+      except Exception:  # noqa: BLE001 — table may not exist yet → skip this feed
+        continue
 
     return list(seen.values())
 

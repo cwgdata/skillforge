@@ -563,3 +563,18 @@ pre.code {
   .nav-item { white-space: nowrap; border-left: none; }
   .side-foot { display: none; }
 }
+
+/* ---- mining toggle switch ---- */
+.switch { position: relative; display: inline-block; width: 38px; height: 21px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute; inset: 0; cursor: pointer; border-radius: 21px;
+  background: rgba(255,255,255,0.16); transition: background 0.15s;
+}
+.switch .slider::before {
+  content: ""; position: absolute; width: 15px; height: 15px; left: 3px; top: 3px;
+  border-radius: 50%; background: #fff; opacity: 0.85; transition: transform 0.15s;
+}
+.switch input:checked + .slider { background: #00B378; }
+.switch input:checked + .slider::before { transform: translateX(17px); }
+.switch input:disabled + .slider { opacity: 0.5; cursor: wait; }
