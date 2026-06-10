@@ -498,10 +498,9 @@ function renderPatterns(res) {
 function valueChips(v) {
   if (!v) return "";
   const chips = [
-    { cl: "Users covered", b: fmt(v.users_covered) },
-    { cl: "~Prompts / mo", b: fmt(v.prompts_per_month_est) },
-    { cl: "Est. monthly token savings", b: fmt(v.est_monthly_token_savings) },
-    { cl: "Input token savings", b: pct(v.input_token_savings_pct) },
+    { cl: "Users", b: fmt(v.users_covered) },
+    { cl: "Prompts / mo", b: fmt(v.prompts_per_month_est) },
+    { cl: "Tokens saved / mo", b: fmt(v.est_monthly_token_savings) },
   ];
   return `<div class="chips">` +
     chips.map((c) => `<div class="chip"><span class="cl">${esc(c.cl)}</span><b>${esc(c.b)}</b></div>`).join("") +
@@ -580,14 +579,14 @@ function renderSkills(res) {
        <div class="desc">${esc(s.description)}</div>
        ${valueChips(v)}
        <details class="tmpl">
-         <summary>Template &amp; details</summary>
+         <summary>Template, parameters${hasAb ? " &amp; quality A/B" : ""}</summary>
          <div class="body">
            <pre class="code">${esc(s.template)}</pre>
            ${params ? `<div class="kv"><b>Parameters</b></div><ul class="param-list">${params}</ul>` : ""}
            ${s.example_invocation ? `<div class="kv"><b>Example invocation</b></div><pre class="code">${esc(s.example_invocation)}</pre>` : ""}
+           ${beforeAfter(s.quality_ab)}
          </div>
        </details>
-       <div class="ab-slot">${beforeAfter(s.quality_ab)}</div>
        <div class="skill-footer">
          ${pubBtn}
          ${adpBtn}
