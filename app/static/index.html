@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillForge — Skill Recommendation Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="header">
+      <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#ff3621" stroke-width="6" stroke-linejoin="round"/>
+        <polygon points="50,26 71,38 71,62 50,74 29,62 29,38" fill="#ff3621" opacity="0.18"/>
+        <path d="M50 30 L50 70 M34 42 L66 58 M66 42 L34 58" stroke="#ff3621" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>SkillForge</h1>
+        <div class="sub">Automatic skill recommendation from AI Gateway usage</div>
+      </div>
+      <div class="gen" id="genInfo"></div>
+    </header>
+
+    <!-- Pending state -->
+    <div id="pending" class="card pending hidden">
+      <div class="big">&#9874;</div>
+      <h3>The engine has not run yet</h3>
+      <p>No <code>results.json</code> found. Once the mining pipeline finishes,<br/>discovered patterns and recommended skills will appear here.</p>
+    </div>
+
+    <!-- Main dashboard -->
+    <div id="dashboard" class="hidden">
+
+      <!-- KPIs -->
+      <section class="section" style="margin-top:26px">
+        <div class="kpis" id="kpis"></div>
+      </section>
+
+      <!-- Charts -->
+      <section class="section">
+        <h2>Usage Signal</h2>
+        <div class="charts">
+          <div class="card chart-card">
+            <h3>Prompts per day</h3>
+            <div class="chart-wrap"><canvas id="chartDay"></canvas></div>
+          </div>
+          <div class="card chart-card">
+            <h3>Tokens by endpoint</h3>
+            <div class="chart-wrap"><canvas id="chartEndpoint"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Patterns -->
+      <section class="section">
+        <h2>Discovered Patterns</h2>
+        <div class="card">
+          <table class="patterns">
+            <thead>
+              <tr>
+                <th>Pattern</th><th>Description</th>
+                <th class="num">Prompts</th><th class="num">Users</th>
+                <th class="num">Tokens</th><th>Purity</th>
+              </tr>
+            </thead>
+            <tbody id="patternRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section class="section">
+        <h2>Recommended Skills</h2>
+        <div class="skill-grid" id="skillGrid"></div>
+      </section>
+
+      <!-- Test bench -->
+      <section class="section">
+        <h2>Test Bench</h2>
+        <p class="hint">Fill a skill's parameters and run it live against the Foundation Model API. Optionally compare against your own raw prompt.</p>
+        <div class="card bench">
+          <div>
+            <label for="benchSkill">Skill</label>
+            <select id="benchSkill"></select>
+          </div>
+          <div id="benchParams"></div>
+          <div>
+            <label for="benchRaw">Compare against your raw prompt (optional)</label>
+            <textarea id="benchRaw" placeholder="Paste the unstructured prompt you'd normally type..."></textarea>
+          </div>
+          <button class="btn" id="benchRun">Run skill</button>
+          <div id="benchError" class="error-banner hidden"></div>
+          <div id="benchOut"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

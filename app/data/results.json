@@ -1,0 +1,549 @@
+{
+  "generated_at": "2026-06-09T22:46:21.075222+00:00",
+  "source": {
+    "table": "cwg_demo_airbnb.skillforge.gateway_usage",
+    "rows": 236,
+    "users": 30,
+    "window_days": 14
+  },
+  "overview": {
+    "total_prompts": 236,
+    "total_input_tokens": 53250,
+    "total_output_tokens": 112088,
+    "users": 30,
+    "endpoints": [
+      "databricks-claude-haiku-4-5",
+      "databricks-claude-sonnet-4-6",
+      "databricks-gpt-oss-120b"
+    ],
+    "unclustered_prompts": 36
+  },
+  "patterns": [
+    {
+      "id": "p1",
+      "name": "Incident RCA / Post-Mortem Drafting",
+      "description": "Requests to draft or structure a root cause analysis or post-mortem document for a production incident, given notes, logs, or ticket text.",
+      "prompt_count": 28,
+      "user_count": 10,
+      "total_tokens": 20915,
+      "example_prompts": [
+        "Can you write the RCA for the latency issue? Queries got slow, P95 spiked to 5s. <ticket text> What was the underlying cause?",
+        "RCA for the certificate expiry incident please. <notes> - renewal automation failed silently. How do we prevent this recurring?",
+        "RCA needed ASAP for the cache invalidation bug. <ticket text> Stale data served to users for 2 hours. How did this slip through?"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "incident_rca"
+    },
+    {
+      "id": "p2",
+      "name": "Support Ticket Triage & Routing",
+      "description": "Requests to classify a support ticket by severity, assign it to the correct team, check for duplicates, and produce a one-line summary.",
+      "prompt_count": 24,
+      "user_count": 12,
+      "total_tokens": 18766,
+      "example_prompts": [
+        "Can u check if this is a dup? <ticket text> - also what team owns this? thx",
+        "Classify severity and route: <ticket text> - also check our KB for similar issues",
+        "Triage request - <ticket text> - severity level, team assignment, one-liner, dup check"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "ticket_triage"
+    },
+    {
+      "id": "p3",
+      "name": "Customer Support Response Drafting",
+      "description": "Requests to draft a helpful, empathetic reply to a customer support ticket covering issues like login problems, billing errors, refunds, API errors, or feature requests.",
+      "prompt_count": 32,
+      "user_count": 5,
+      "total_tokens": 23564,
+      "example_prompts": [
+        "Draft a polite response to this angry customer. Keep it professional but empathetic. <ticket text>",
+        "Irate customer - billing error charged them 10x. Draft immediate apology + resolution steps. <ticket text>",
+        "Feature request for custom branding. Draft something encouraging but realistic about timeline. <ticket text>"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "support_reply"
+    },
+    {
+      "id": "p4",
+      "name": "Meeting Notes \u2192 Action Items / Recap",
+      "description": "Requests to extract action items, decisions, owners, and deadlines from meeting transcripts or notes, often formatted as an email recap or tracker-ready list.",
+      "prompt_count": 23,
+      "user_count": 10,
+      "total_tokens": 18683,
+      "example_prompts": [
+        "Can you extract the key decisions from this architecture review meeting? <meeting_transcript>",
+        "What are the critical action items in this project kickoff doc? Bullet format pls. <meeting_notes>",
+        "Summarize this vendor evaluation meeting - what we learned, decisions made, next steps w/ owners. <notes>"
+      ],
+      "purity_pct": 87.0,
+      "dominant_latent": "meeting_actions"
+    },
+    {
+      "id": "p5",
+      "name": "Code / PR Review Summary",
+      "description": "Requests to summarize a code diff or pull request, highlighting what changed, risks, and test coverage gaps \u2014 across Python, Go, and Terraform.",
+      "prompt_count": 24,
+      "user_count": 8,
+      "total_tokens": 18084,
+      "example_prompts": [
+        "Terraform diff - summarize changes, flag risks, check test coverage <diff>",
+        "Summarize this Go PR changes + risks + test coverage in a few bullets <diff>",
+        "Need a summary of this Python code change for PR review. Risks? Tests? <diff>"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "pr_summary"
+    },
+    {
+      "id": "p6",
+      "name": "SQL Query Writing",
+      "description": "Requests to write SQL or Databricks/Trino SQL queries for analytics tasks such as revenue by region, churn cohorts, customer segmentation, order analysis, and sensor data.",
+      "prompt_count": 36,
+      "user_count": 10,
+      "total_tokens": 26621,
+      "example_prompts": [
+        "I need orders from customers whose lifetime value is in the top 20%. Can you write that query?",
+        "Pull revenue_by_region for 2023 and calculate YoY growth vs 2022. Need month-by-month breakdown.",
+        "Query to show top 10 customers by total order value in 2023. Include their region and signup date."
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "nl2sql"
+    },
+    {
+      "id": "p7",
+      "name": "Document / Report Summarization",
+      "description": "Requests to summarize a document such as an RFP, API spec, design doc, report, runbook, audit, or research paper into key bullets or a short summary.",
+      "prompt_count": 17,
+      "user_count": 11,
+      "total_tokens": 12474,
+      "example_prompts": [
+        "Break down this vendor proposal into pros/cons and a recommendation. <proposal_text>",
+        "Summarize this performance audit in simple terms. Where are the bottlenecks? <audit_results>",
+        "Summarize this RFP response from the vendor into key capabilities and pricing tiers. <rfp_response>"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "doc_summarize"
+    },
+    {
+      "id": "p8",
+      "name": "Regex / Grok Pattern Help",
+      "description": "Requests to explain, debug, write, convert, or improve regex or Grok patterns for log parsing and pattern matching.",
+      "prompt_count": 16,
+      "user_count": 10,
+      "total_tokens": 13110,
+      "example_prompts": [
+        "what's the best way to parse json logs with grok? we're using logstash and the current pattern is too slow",
+        "need help parsing docker container logs. format is json but sometimes it breaks across lines. what's the best approach?",
+        "trying to match ipv6 addresses in logs but the regex is massive. is there a cleaner way or should i just use a library?"
+      ],
+      "purity_pct": 100.0,
+      "dominant_latent": "log_regex"
+    }
+  ],
+  "skills": [
+    {
+      "id": "s1",
+      "pattern_id": "p1",
+      "name": "incident-rca-postmortem-drafter",
+      "title": "Incident RCA / Post-Mortem Document Drafter",
+      "description": "Generates a structured, blameless root cause analysis and post-mortem document from raw incident notes, logs, or ticket text. Encodes SRE best-practice sections including timeline, contributing factors, impact, and actionable follow-ups.",
+      "template": "You are a senior Site Reliability Engineer with deep expertise in production systems, incident management, and blameless post-mortem culture. Your task is to produce a clear, thorough, and actionable RCA/post-mortem document.\n\n---\n\n## INCIDENT INPUTS\n\n**Incident Title:** {incident_title}\n\n**Severity / Priority:** {severity}\n\n**Affected Service(s):** {affected_services}\n\n**Incident Duration:** {incident_duration}\n\n**Raw Notes, Logs, Ticket Text, or Diffs:**\n<incident_data>\n{incident_data}\n</incident_data>\n\n**Known or Suspected Root Cause (optional \u2014 leave blank if unknown):** {suspected_root_cause}\n\n---\n\n## OUTPUT FORMAT\n\nProduce the post-mortem as a structured Markdown document with exactly the following sections. Do not skip or rename sections.\n\n### 1. Executive Summary\nA 3\u20135 sentence plain-language summary of what happened, the business/user impact, and the resolution. Suitable for non-technical stakeholders.\n\n### 2. Impact\n- **Users / Customers affected:** (estimated count or percentage if derivable)\n- **Duration of impact:**\n- **Systems / Services affected:**\n- **Data integrity impact:** (yes/no + explanation)\n- **Revenue / SLA impact:** (if inferable)\n\n### 3. Timeline\nA chronological table of key events. Use this format:\n\n| Time (UTC) | Event |\n|------------|-------|\n| HH:MM | ... |\n\nInclude: first alert/detection, escalation points, mitigation steps, resolution, and all-clear.\n\n### 4. Root Cause Analysis\n**Immediate Cause:** The direct technical trigger (e.g., the specific code change, config error, or resource exhaustion).\n\n**Contributing Factors:** A bulleted list of systemic, process, or environmental conditions that allowed the immediate cause to have impact (e.g., missing monitoring, gaps in review process, lack of feature flags).\n\n**Why It Wasn't Caught Earlier:** Explicitly address each detection/prevention layer that failed or was absent (code review, tests, staging, alerts, canary deploys, etc.).\n\n### 5. What Went Well\nBulleted list of things the team did effectively during detection, response, or resolution.\n\n### 6. What Went Poorly\nBulleted list of gaps, delays, or process failures observed during the incident.\n\n### 7. Action Items\nA prioritized table of concrete follow-up tasks. Use this format:\n\n| Priority | Action Item | Owner (Role) | Due Date | Prevents Recurrence Of |\n|----------|-------------|--------------|----------|------------------------|\n| P1/P2/P3 | ... | ... | {action_item_due_date} | ... |\n\nEach action item must be specific and testable \u2014 avoid vague items like \"improve monitoring.\"\n\n### 8. Lessons Learned\n2\u20134 concise takeaways that would be valuable to share with the broader engineering organization.\n\n---\n\n## CONSTRAINTS\n- **Blameless tone:** Focus on systems, processes, and conditions \u2014 never assign personal fault to individuals.\n- **Be specific:** Where the input data supports it, cite exact error messages, metric values, line numbers, or timestamps. Do not fabricate specifics not present in the input.\n- **Flag gaps:** If critical information is missing (e.g., no timeline data, no alert timestamps), explicitly note it as `[DATA NEEDED: ...]` inline rather than guessing.\n- **Avoid jargon inflation:** Write clearly enough that a PM or VP of Engineering can understand the Executive Summary without a glossary.\n- **Action items must be actionable:** Every action item must have a clear verb, a measurable outcome, and map to a specific gap identified in Section 6 or Section 4.",
+      "parameters": [
+        {
+          "name": "incident_title",
+          "description": "Short descriptive title for the incident, e.g. 'API Gateway 503 Errors During Peak Traffic' or 'Memory Leak Causing Auth Service Crash Loop'"
+        },
+        {
+          "name": "severity",
+          "description": "Incident severity or priority level, e.g. 'SEV-1 / P0', 'SEV-2 / P1', or your org's equivalent"
+        },
+        {
+          "name": "affected_services",
+          "description": "Comma-separated list of services, APIs, or infrastructure components involved, e.g. 'payments-service, checkout-api, PostgreSQL primary'"
+        },
+        {
+          "name": "incident_duration",
+          "description": "Total duration from first impact to full resolution, e.g. '2 hours 14 minutes (14:32\u201316:46 UTC)'"
+        },
+        {
+          "name": "incident_data",
+          "description": "All raw input material: paste in ticket text, Slack thread excerpts, log snippets, git diffs, alert payloads, or any combination. More detail produces a better document."
+        },
+        {
+          "name": "suspected_root_cause",
+          "description": "Optional. Any hypothesis or known cause already identified by the team. Leave blank or write 'Unknown' to let the model derive it from the incident data."
+        },
+        {
+          "name": "action_item_due_date",
+          "description": "Default target due date to pre-fill in the action items table, e.g. '2024-02-15' or 'Within 2 sprints'. Individual items can be adjusted in the output."
+        }
+      ],
+      "example_invocation": "You are a senior Site Reliability Engineer with deep expertise in production systems, incident management, and blameless post-mortem culture. Your task is to produce a clear, thorough, and actionable RCA/post-mortem document.\n\n---\n\n## INCIDENT INPUTS\n\n**Incident Title:** Kafka Consumer Lag Spike \u2014 Order Processing Pipeline Delayed 47 Minutes\n\n**Severity / Priority:** SEV-2 / P1\n\n**Affected Service(s):** order-processor-service, kafka-consumer-group (orders-v2), downstream fulfillment-api\n\n**Incident Duration:** 47 minutes (23:12\u201323:59 UTC, 2024-01-18)\n\n**Raw Notes, Logs, Ticket Text, or Diffs:**\n<incident_data>\nJIRA INC-4821 \u2014 Opened 23:14 UTC by on-call engineer @maya.chen\n\nAlert fired: consumer_lag{group=orders-v2} > 500000 messages for 5 minutes\nBy 23:20 lag had grown to 2.1M messages. No new deployments in last 6 hours.\nChecked consumer pod logs \u2014 seeing repeated: 'ERROR DeserializationException: Unknown magic byte 0x02 at offset 1'\nAll 8 consumer pods throwing same error. Consumers not crashing, just skipping and retrying.\n23:31 \u2014 @dev.ops.ravi identified that the payments-service team deployed a schema change to the orders Avro schema at 22:58 UTC adding a required field `payment_method_v2` without a default value.\nSchema registry shows schema ID 47 (new) vs 31 (what consumers expect).\n23:38 \u2014 Hotfix: payments team added default value to new field, bumped to schema ID 48, redeployed producers.\n23:44 \u2014 Consumer lag began decreasing.\n23:59 \u2014 Lag back to baseline (<1000 messages). All orders processed. No orders lost, but 47-min delay.\nPost-incident: fulfillment-api SLA breach logged \u2014 3,200 orders delayed beyond 30-min SLA window.\n</incident_data>\n\n**Known or Suspected Root Cause (optional \u2014 leave blank if unknown):** Backward-incompatible Avro schema change deployed to producers without coordinating consumer readiness or using a compatible schema evolution strategy.\n\n---\n\n## OUTPUT FORMAT\n\nProduce the post-mortem as a structured Markdown document with exactly the following sections. Do not skip or rename sections.\n\n### 1. Executive Summary\nA 3\u20135 sentence plain-language summary of what happened, the business/user impact, and the resolution. Suitable for non-technical stakeholders.\n\n### 2. Impact\n- **Users / Customers affected:** (estimated count or percentage if derivable)\n- **Duration of impact:**\n- **Systems / Services affected:**\n- **Data integrity impact:** (yes/no + explanation)\n- **Revenue / SLA impact:** (if inferable)\n\n### 3. Timeline\nA chronological table of key events. Use this format:\n\n| Time (UTC) | Event |\n|------------|-------|\n| HH:MM | ... |\n\nInclude: first alert/detection, escalation points, mitigation steps, resolution, and all-clear.\n\n### 4. Root Cause Analysis\n**Immediate Cause:** The direct technical trigger (e.g., the specific code change, config error, or resource exhaustion).\n\n**Contributing Factors:** A bulleted list of systemic, process, or environmental conditions that allowed the immediate cause to have impact (e.g., missing monitoring, gaps in review process, lack of feature flags).\n\n**Why It Wasn't Caught Earlier:** Explicitly address each detection/prevention layer that failed or was absent (code review, tests, staging, alerts, canary deploys, etc.).\n\n### 5. What Went Well\nBulleted list of things the team did effectively during detection, response, or resolution.\n\n### 6. What Went Poorly\nBulleted list of gaps, delays, or process failures observed during the incident.\n\n### 7. Action Items\nA prioritized table of concrete follow-up tasks. Use this format:\n\n| Priority | Action Item | Owner (Role) | Due Date | Prevents Recurrence Of |\n|----------|-------------|--------------|----------|------------------------|\n| P1/P2/P3 | ... | ... | 2024-02-01 | ... |\n\nEach action item must be specific and testable \u2014 avoid vague items like 'improve monitoring.'\n\n### 8. Lessons Learned\n2\u20134 concise takeaways that would be valuable to share with the broader engineering organization.\n\n---\n\n## CONSTRAINTS\n- **Blameless tone:** Focus on systems, processes, and conditions \u2014 never assign personal fault to individuals.\n- **Be specific:** Where the input data supports it, cite exact error messages, metric values, line numbers, or timestamps. Do not fabricate specifics not present in the input.\n- **Flag gaps:** If critical information is missing (e.g., no timeline data, no alert timestamps), explicitly note it as `[DATA NEEDED: ...]` inline rather than guessing.\n- **Avoid jargon inflation:** Write clearly enough that a PM or VP of Engineering can understand the Executive Summary without a glossary.\n- **Action items must be actionable:** Every action item must have a clear verb, a measurable outcome, and map to a specific gap identified in Section 6 or Section 4.",
+      "value": {
+        "users_covered": 10,
+        "prompt_count_14d": 28,
+        "prompts_per_month_est": 60,
+        "est_monthly_tokens": 44818,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 4526,
+        "priority": "high"
+      },
+      "quality_ab": {
+        "raw_prompt": "Help me write the RCA for the Kafka broker failure. - one broker went down and consumers couldn't rebalance properly. Root cause?\n\nTicket text: On 2024-01-22 at 03:14 UTC, broker-2 in the us-east-1 Kafka cluster became unresponsive after an OOM kill triggered by a JVM heap exhaustion event. Consumer groups order-processor and inventory-sync lost their partition assignments and entered a rebalance loop, failing to stabilize for 47 minutes. Alerts fired at 03:19 UTC. The on-call engineer manually restarted broker-2 at 03:51 UTC and consumer groups recovered by 04:01 UTC. Approximately 18,000 messages were delayed; no messages were lost. Suspected cause: heap size misconfiguration after last week's broker config change.",
+        "skill_prompt": "You are a senior Site Reliability Engineer with deep expertise in production systems, incident management, and blameless post-mortem culture. Your task is to produce a clear, thorough, and actionable RCA/post-mortem document.\n\n---\n\n## INCIDENT INPUTS\n\n**Incident Title:** Kafka Broker OOM Failure Causing Consumer Rebalance Loop\n\n**Severity / Priority:** SEV-2 / P1\n\n**Affected Service(s):** Kafka cluster (us-east-1), order-processor consumer group, inventory-sync consumer group\n\n**Incident Duration:** 47 minutes (03:14\u201304:01 UTC, 2024-01-22)\n\n**Raw Notes, Logs, Ticket Text, or Diffs:**\n<incident_data>\nOn 2024-01-22 at 03:14 UTC, broker-2 in the us-east-1 Kafka cluster became unresponsive after an OOM kill triggered by a JVM heap exhaustion event. Consumer groups order-processor and inventory-sync lost their partition assignments and entered a rebalance loop, failing to stabilize for 47 minutes. Alerts fired at 03:19 UTC. The on-call engineer manually restarted broker-2 at 03:51 UTC and consumer groups recovered by 04:01 UTC. Approximately 18,000 messages were delayed; no messages were lost. Suspected cause: heap size misconfiguration after last week's broker config change.\n</incident_data>\n\n**Known or Suspected Root Cause (optional \u2014 leave blank if unknown):** JVM heap exhaustion on broker-2 following a broker configuration change the prior week that likely reduced or misconfigured the heap size setting.\n\n---\n\n## OUTPUT FORMAT\n\nProduce the post-mortem as a structured Markdown document with exactly the following sections. Do not skip or rename sections.\n\n### 1. Executive Summary\nA 3\u20135 sentence plain-language summary of what happened, the business/user impact, and the resolution. Suitable for non-technical stakeholders.\n\n### 2. Impact\n- **Users / Customers affected:** (estimated count or percentage if derivable)\n- **Duration of impact:**\n- **Systems / Services affected:**\n- **Data integrity impact:** (yes/no + explanation)\n- **Revenue / SLA impact:** (if inferable)\n\n### 3. Timeline\nA chronological table of key events. Use this format:\n\n| Time (UTC) | Event |\n|------------|-------|\n| HH:MM | ... |\n\nInclude: first alert/detection, escalation points, mitigation steps, resolution, and all-clear.\n\n### 4. Root Cause Analysis\n**Immediate Cause:** The direct technical trigger (e.g., the specific code change, config error, or resource exhaustion).\n\n**Contributing Factors:** A bulleted list of systemic, process, or environmental conditions that allowed the immediate cause to have impact (e.g., missing monitoring, gaps in review process, lack of feature flags).\n\n**Why It Wasn't Caught Earlier:** Explicitly address each detection/prevention layer that failed or was absent (code review, tests, staging, alerts, canary deploys, etc.).\n\n### 5. What Went Well\nBulleted list of things the team did effectively during detection, response, or resolution.\n\n### 6. What Went Poorly\nBulleted list of gaps, delays, or process failures observed during the incident.\n\n### 7. Action Items\nA prioritized table of concrete follow-up tasks. Use this format:\n\n| Priority | Action Item | Owner (Role) | Due Date | Prevents Recurrence Of |\n|----------|-------------|--------------|----------|------------------------|\n| P1/P2/P3 | ... | ... | Within 2 sprints | ... |\n\nEach action item must be specific and testable \u2014 avoid vague items like \"improve monitoring.\"\n\n### 8. Lessons Learned\n2\u20134 concise takeaways that would be valuable to share with the broader engineering organization.\n\n---\n\n## CONSTRAINTS\n- **Blameless tone:** Focus on systems, processes, and conditions \u2014 never assign personal fault to individuals.\n- **Be specific:** Where the input data supports it, cite exact error messages, metric values, line numbers, or timestamps. Do not fabricate specifics not present in the input.\n- **Flag gaps:** If critical information is missing (e.g., no timeline data, no alert timestamps), explicitly note it as `[DATA NEEDED: ...]` inline rather than guessing.\n- **Avoid jargon inflation:** Write clearly enough that a PM or VP of Engineering can understand the Executive Summary without a glossary.\n- **Action items must be actionable:** Every action item must have a clear verb, a measurable outcome, and map to a specific gap identified in Section 6 or Section 4.",
+        "raw_answer": "# Root Cause Analysis: Kafka Broker Failure & Consumer Rebalance Loop\n\n## Executive Summary\nBroker-2 experienced an OOM kill due to JVM heap exhaustion, triggering a 47-minute outage affecting two consumer groups. Root cause: **undersized heap configuration introduced during recent broker maintenance**.\n\n---\n\n## Incident Timeline\n| Time (UTC) | Event |\n|-----------|-------|\n| 03:14 | Broker-2 OOM kill; becomes unresponsive |\n| 03:19 | Alerting fires |\n| 03:14\u201303:51 | Consumers in rebalance loop; partition assignments lost |\n| 03:51 | Manual broker restart |\n| 04:01 | Consumer groups stabilized",
+        "skill_answer": "# Post-Mortem: Kafka Broker OOM Failure Causing Consumer Rebalance Loop\n\n**Incident ID:** kafka-broker-oom-20240122  \n**Date:** 2024-01-22  \n**Prepared by:** [SRE On-Call / Incident Commander]  \n**Review Date:** [To be scheduled]\n\n---\n\n## 1. Executive Summary\n\nOn January 22, 2024, broker-2 in our us-east-1 Kafka cluster exhausted its JVM heap memory and was killed by the operating system, causing two critical consumer groups (order-processor and inventory-sync) to lose partition assignments and enter a rebalance loop. The broker remained unresponsive for 47 minutes until manual restart. While ",
+        "raw_score": 6,
+        "skill_score": 9,
+        "rationale": "Answer A provides a solid, readable RCA with good structure and actionable remediation steps, but lacks several required sections (What Went Well, What Went Poorly, Lessons Learned, prioritized action items table), uses vague placeholders, and cuts off mid-document. Answer B follows a precise, professionally specified format with explicit data gaps flagged, blameless tone, measurable action items, and comprehensive coverage of all required sections including impact dimensions and a properly structured timeline, demonstrating significantly higher SRE craft and prompt adherence."
+      }
+    },
+    {
+      "id": "s2",
+      "pattern_id": "p2",
+      "name": "support-ticket-triage-and-routing",
+      "title": "Support Ticket Triage & Routing",
+      "description": "Classifies a support ticket by severity, routes it to the correct team, flags potential duplicates, and produces a structured triage report. Designed for support engineers and on-call responders who need fast, consistent ticket handling.",
+      "template": "You are an expert Support Triage Engineer with deep knowledge of {product_name} and its team ownership model. Your job is to produce a fast, accurate, and actionable triage report.\n\n---\n## TICKET INPUT\n\n**Ticket ID:** {ticket_id}\n**Submitted by:** {submitter}\n**Ticket Text:**\n<ticket>\n{ticket_text}\n</ticket>\n\n**Attached Logs / Error Details (if any):**\n<logs>\n{logs_or_errors}\n</logs>\n\n---\n## KNOWN ISSUES & TEAM OWNERSHIP CONTEXT\n\n**Recent known issues:**\n<known_issues>\n{known_issues_list}\n</known_issues>\n\n**Team ownership map:**\n<team_map>\n{team_ownership_map}\n</team_map>\n\n---\n## YOUR TASK\n\nAnalyze the ticket above and produce a triage report using EXACTLY the output format below. Do not add extra sections or commentary outside the format.\n\n---\n## OUTPUT FORMAT\n\n**1. ONE-LINE SUMMARY**\nA single sentence (\u226420 words) describing the core issue.\n\n**2. SEVERITY**\nAssign one level and provide a one-sentence justification:\n- P1 \u2013 Critical: service down or data loss, affects many users or a key partner\n- P2 \u2013 High: major feature broken, significant user impact, no workaround\n- P3 \u2013 Medium: degraded experience, workaround exists\n- P4 \u2013 Low: cosmetic, minor inconvenience, single user\n\nSeverity: [P1 | P2 | P3 | P4]\nJustification: [one sentence]\n\n**3. ASSIGNED TEAM**\nBased on the team ownership map, name the single team that should own this ticket.\nAssigned Team: [team name]\nReasoning: [one sentence explaining why]\n\n**4. DUPLICATE / KNOWN ISSUE CHECK**\nCompare against the known issues list.\n- If a match is found: state the matching issue ID/title and recommend linking or closing as duplicate.\n- If no match: state \"No known duplicate identified.\"\n\nDuplicate Status: [Duplicate of <issue> | No known duplicate identified]\nAction: [Link to existing issue and notify reporter | Proceed as new ticket]\n\n**5. RECOMMENDED NEXT STEP**\nOne concrete action the on-call responder should take in the next 15 minutes.\n\n---\n## CONSTRAINTS\n- Base severity strictly on user impact and blast radius, not on the submitter's urgency language.\n- If logs or error details are missing, note what information would change the severity assessment.\n- Do not speculate beyond the provided context; flag uncertainty explicitly.\n- Keep every field concise \u2014 this report will be pasted directly into the ticketing system.",
+      "parameters": [
+        {
+          "name": "product_name",
+          "description": "The name of the product or platform the ticket relates to (e.g., 'Acme Payments API', 'DataSync Pro'). Gives the model domain context for ownership and severity decisions."
+        },
+        {
+          "name": "ticket_id",
+          "description": "The unique identifier of the ticket (e.g., 'TICK-4821'). Used for traceability in the output report."
+        },
+        {
+          "name": "submitter",
+          "description": "Who filed the ticket \u2014 customer name, partner name, or internal user (e.g., 'Stripe (partner)', 'jane.doe@company.com'). Informs blast-radius and priority assessment."
+        },
+        {
+          "name": "ticket_text",
+          "description": "The full raw text of the support ticket exactly as submitted. Wrap in the provided <ticket> tags."
+        },
+        {
+          "name": "logs_or_errors",
+          "description": "Any attached stack traces, error responses, or log snippets. Use 'None provided' if absent."
+        },
+        {
+          "name": "known_issues_list",
+          "description": "A structured list of current known issues with IDs and short descriptions (e.g., 'KI-112: OAuth token refresh failing for EU region since 2024-06-01'). Use 'None' if unavailable."
+        },
+        {
+          "name": "team_ownership_map",
+          "description": "A mapping of product areas or error domains to responsible teams (e.g., 'Auth errors \u2192 Identity Team; Payment webhooks \u2192 Integrations Team'). Drives the routing decision."
+        }
+      ],
+      "example_invocation": "You are an expert Support Triage Engineer with deep knowledge of Acme Payments API and its team ownership model. Your job is to produce a fast, accurate, and actionable triage report.\n\n---\n## TICKET INPUT\n\n**Ticket ID:** TICK-5503\n**Submitted by:** GlobalRetail Inc. (enterprise partner)\n**Ticket Text:**\n<ticket>\nOur checkout integration has been throwing 401 Unauthorized errors on every POST /v2/charges request since approximately 14:00 UTC today. This is affecting 100% of our transactions. We have not changed our API keys or integration code. Revenue impact is ongoing.\n</ticket>\n\n**Attached Logs / Error Details (if any):**\n<logs>\nHTTP 401 Unauthorized\n{\"error\": \"invalid_api_key\", \"message\": \"The provided API key does not match any active credentials.\", \"request_id\": \"req_9Xk2mPqL\"}\nOccurring on every request since 14:03 UTC. Key last rotated 47 days ago.\n</logs>\n\n---\n## KNOWN ISSUES & TEAM OWNERSHIP CONTEXT\n\n**Recent known issues:**\n<known_issues>\nKI-198: Intermittent 429 rate-limit errors on /v2/charges for free-tier accounts (2024-06-10) \u2014 Integrations Team\nKI-201: API key validation service deployed v3.4.1 at 13:55 UTC today \u2014 potential regression under investigation \u2014 Identity Team\nKI-195: Webhook delivery delays in AP region (resolved 2024-06-08)\n</known_issues>\n\n**Team ownership map:**\n<team_map>\nAuth / API key errors \u2192 Identity Team\nCharge & payment processing \u2192 Payments Core Team\nWebhooks & partner integrations \u2192 Integrations Team\nFrontend / dashboard issues \u2192 Frontend Team\nInfrastructure & latency \u2192 Platform Reliability Team\n</team_map>\n\n---\n## YOUR TASK\n\nAnalyze the ticket above and produce a triage report using EXACTLY the output format below. Do not add extra sections or commentary outside the format.\n\n---\n## OUTPUT FORMAT\n\n**1. ONE-LINE SUMMARY**\nA single sentence (\u226420 words) describing the core issue.\n\n**2. SEVERITY**\nAssign one level and provide a one-sentence justification:\n- P1 \u2013 Critical: service down or data loss, affects many users or a key partner\n- P2 \u2013 High: major feature broken, significant user impact, no workaround\n- P3 \u2013 Medium: degraded experience, workaround exists\n- P4 \u2013 Low: cosmetic, minor inconvenience, single user\n\nSeverity: [P1 | P2 | P3 | P4]\nJustification: [one sentence]\n\n**3. ASSIGNED TEAM**\nBased on the team ownership map, name the single team that should own this ticket.\nAssigned Team: [team name]\nReasoning: [one sentence explaining why]\n\n**4. DUPLICATE / KNOWN ISSUE CHECK**\nCompare against the known issues list.\n- If a match is found: state the matching issue ID/title and recommend linking or closing as duplicate.\n- If no match: state \"No known duplicate identified.\"\n\nDuplicate Status: [Duplicate of <issue> | No known duplicate identified]\nAction: [Link to existing issue and notify reporter | Proceed as new ticket]\n\n**5. RECOMMENDED NEXT STEP**\nOne concrete action the on-call responder should take in the next 15 minutes.\n\n---\n## CONSTRAINTS\n- Base severity strictly on user impact and blast radius, not on the submitter's urgency language.\n- If logs or error details are missing, note what information would change the severity assessment.\n- Do not speculate beyond the provided context; flag uncertainty explicitly.\n- Keep every field concise \u2014 this report will be pasted directly into the ticketing system.",
+      "value": {
+        "users_covered": 12,
+        "prompt_count_14d": 24,
+        "prompts_per_month_est": 51,
+        "est_monthly_tokens": 40213,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 3308,
+        "priority": "high"
+      },
+      "quality_ab": null
+    },
+    {
+      "id": "s3",
+      "pattern_id": "p3",
+      "name": "customer-support-response-drafter",
+      "title": "Customer Support Response Drafter",
+      "description": "Drafts a professional, empathetic customer support reply for a given ticket. Adapts tone, technical depth, and structure based on the issue type, customer sentiment, and any policy or timeline constraints provided.",
+      "template": "You are an experienced customer support specialist known for clear, empathetic, and on-brand communication.\n\n## Your Task\nDraft a customer support reply to the ticket below.\n\n---\n## Ticket Details\n**Issue Category:** {issue_category}\n**Customer Sentiment:** {customer_sentiment}\n**Ticket Text:**\n\"\"\"\n{ticket_text}\n\"\"\"\n\n---\n## Context & Constraints\n**Technical Level of Customer:** {customer_tech_level}\n**Relevant Policy / Timeline / Notes:** {policy_or_notes}\n\n---\n## Output Format\nWrite the reply using this structure:\n1. **Greeting** \u2014 Address the customer warmly by name if available, or use a friendly generic opener.\n2. **Acknowledgment** \u2014 Validate their experience in 1\u20132 sentences. Match the empathy level to the customer sentiment.\n3. **Resolution / Response** \u2014 Provide a clear, actionable answer, step-by-step instructions, or an honest status update. Adjust technical language to match the customer's tech level: use plain language for non-technical customers, precise terminology for technical ones.\n4. **Policy or Timeline Clarity** (if applicable) \u2014 State any relevant policy, limitation, or timeline plainly and kindly \u2014 never defensively.\n5. **Next Steps / Offer of Further Help** \u2014 Tell the customer exactly what happens next or invite follow-up questions.\n6. **Closing** \u2014 Warm, professional sign-off.\n\n## Constraints\n- Tone: {tone}\n- Length: Concise but complete \u2014 no unnecessary filler, no walls of text.\n- Do NOT make promises that contradict the policy or timeline notes above.\n- Do NOT use jargon or acronyms unless the customer's tech level is 'technical'.\n- Do NOT blame the customer or be defensive about the company.\n- Output ONLY the final reply text, ready to send. No meta-commentary.",
+      "parameters": [
+        {
+          "name": "issue_category",
+          "description": "The type of support issue. Examples: 'Login / Account Access', 'Billing Error', 'Refund Request', 'API Error', 'Feature Request', 'General Inquiry'."
+        },
+        {
+          "name": "customer_sentiment",
+          "description": "The emotional tone of the customer in the ticket. Examples: 'frustrated', 'confused', 'neutral', 'angry', 'politely disappointed'."
+        },
+        {
+          "name": "ticket_text",
+          "description": "The full verbatim text of the customer's support ticket or message."
+        },
+        {
+          "name": "customer_tech_level",
+          "description": "The apparent technical sophistication of the customer. Use 'non-technical' for everyday users, 'semi-technical' for moderately savvy users, or 'technical' for developers and power users."
+        },
+        {
+          "name": "policy_or_notes",
+          "description": "Any relevant company policy, known issue status, refund rules, feature roadmap timeline, or internal context the reply must respect. Write 'None' if not applicable."
+        },
+        {
+          "name": "tone",
+          "description": "The desired voice for the reply. Examples: 'warm and reassuring', 'professional and concise', 'friendly and casual', 'empathetic but firm'."
+        }
+      ],
+      "example_invocation": "You are an experienced customer support specialist known for clear, empathetic, and on-brand communication.\n\n## Your Task\nDraft a customer support reply to the ticket below.\n\n---\n## Ticket Details\n**Issue Category:** Login / Account Access\n**Customer Sentiment:** frustrated\n**Ticket Text:**\n\"\"\"\nHi, I've been trying to log into my account on the mobile app for the past two days and it keeps saying my password is wrong. I know it's correct because I use a password manager. I tried resetting it once but now I'm locked out completely and can't get any work done. This is really urgent for me.\n\"\"\"\n\n---\n## Context & Constraints\n**Technical Level of Customer:** non-technical\n**Relevant Policy / Timeline / Notes:** Accounts lock after 5 failed attempts. Lockouts automatically lift after 30 minutes, or support can manually unlock immediately. Password reset emails sometimes land in spam. Self-serve unlock is available at help.example.com/unlock.\n\n---\n## Output Format\nWrite the reply using this structure:\n1. **Greeting** \u2014 Address the customer warmly by name if available, or use a friendly generic opener.\n2. **Acknowledgment** \u2014 Validate their experience in 1\u20132 sentences. Match the empathy level to the customer sentiment.\n3. **Resolution / Response** \u2014 Provide a clear, actionable answer, step-by-step instructions, or an honest status update. Adjust technical language to match the customer's tech level: use plain language for non-technical customers, precise terminology for technical ones.\n4. **Policy or Timeline Clarity** (if applicable) \u2014 State any relevant policy, limitation, or timeline plainly and kindly \u2014 never defensively.\n5. **Next Steps / Offer of Further Help** \u2014 Tell the customer exactly what happens next or invite follow-up questions.\n6. **Closing** \u2014 Warm, professional sign-off.\n\n## Constraints\n- Tone: warm and reassuring\n- Length: Concise but complete \u2014 no unnecessary filler, no walls of text.\n- Do NOT make promises that contradict the policy or timeline notes above.\n- Do NOT use jargon or acronyms unless the customer's tech level is 'technical'.\n- Do NOT blame the customer or be defensive about the company.\n- Output ONLY the final reply text, ready to send. No meta-commentary.",
+      "value": {
+        "users_covered": 5,
+        "prompt_count_14d": 32,
+        "prompts_per_month_est": 69,
+        "est_monthly_tokens": 50494,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 5228,
+        "priority": "high"
+      },
+      "quality_ab": {
+        "raw_prompt": "Feature request - customer wants webhook support. Draft something that acknowledges the value + realistic timeline. Hi, I'm a developer integrating your platform into our internal tooling. Right now I have to poll your API every few minutes to check for status changes, which is inefficient and burns through our rate limit. Webhook support would be a game-changer for us \u2014 we could react to events in real time. Is this something on your roadmap? Would love to know if there's an ETA or a workaround in the meantime. Thanks, Marcus",
+        "skill_prompt": "You are an experienced customer support specialist known for clear, empathetic, and on-brand communication.\n\n## Your Task\nDraft a customer support reply to the ticket below.\n\n---\n## Ticket Details\n**Issue Category:** Feature Request\n**Customer Sentiment:** neutral\n**Ticket Text:**\n\"\"\"\nHi, I'm a developer integrating your platform into our internal tooling. Right now I have to poll your API every few minutes to check for status changes, which is inefficient and burns through our rate limit. Webhook support would be a game-changer for us \u2014 we could react to events in real time. Is this something on your roadmap? Would love to know if there's an ETA or a workaround in the meantime. Thanks, Marcus\n\"\"\"\n\n---\n## Context & Constraints\n**Technical Level of Customer:** technical\n**Relevant Policy / Timeline / Notes:** Webhook support is confirmed on the product roadmap and is currently targeted for release in Q3 of this year, though this timeline is not yet publicly committed. In the meantime, customers can reduce polling overhead by using the bulk status endpoint with conditional requests (ETag/If-None-Match) to minimize rate limit consumption.\n\n---\n## Output Format\nWrite the reply using this structure:\n1. **Greeting** \u2014 Address the customer warmly by name if available, or use a friendly generic opener.\n2. **Acknowledgment** \u2014 Validate their experience in 1\u20132 sentences. Match the empathy level to the customer sentiment.\n3. **Resolution / Response** \u2014 Provide a clear, actionable answer, step-by-step instructions, or an honest status update. Adjust technical language to match the customer's tech level: use plain language for non-technical customers, precise terminology for technical ones.\n4. **Policy or Timeline Clarity** (if applicable) \u2014 State any relevant policy, limitation, or timeline plainly and kindly \u2014 never defensively.\n5. **Next Steps / Offer of Further Help** \u2014 Tell the customer exactly what happens next or invite follow-up questions.\n6. **Closing** \u2014 Warm, professional sign-off.\n\n## Constraints\n- Tone: professional and concise\n- Length: Concise but complete \u2014 no unnecessary filler, no walls of text.\n- Do NOT make promises that contradict the policy or timeline notes above.\n- Do NOT use jargon or acronyms unless the customer's tech level is 'technical'.\n- Do NOT blame the customer or be defensive about the company.\n- Output ONLY the final reply text, ready to send. No meta-commentary.",
+        "raw_answer": "# Response to Webhook Support Request\n\nHi Marcus,\n\nThanks for the detailed context\u2014I completely understand the pain here. Polling every few minutes is definitely not ideal, and I appreciate you flagging the rate limit impact.\n\n**The good news:** Webhooks are absolutely on our roadmap. This is one of the most requested features, and we recognize it's a critical piece for integrations like yours.\n\n**Realistic timeline:** We're targeting Q2 2024 for an initial release. That said, I want to be honest\u2014we're still in the design phase for event types and retry logic, so this could shift by a month or",
+        "skill_answer": "Hi Marcus,\n\nThanks for reaching out, and I completely understand the friction\u2014polling every few minutes is inefficient, and I appreciate you flagging how it impacts your rate limit consumption.\n\nGreat news: webhook support is confirmed on our product roadmap and we're actively developing it for release in Q3 this year. While I can't commit to a specific date just yet, this is a priority for us, and we're making solid progress.\n\nIn the meantime, here's a workaround that should ease the pressure on your rate limits: use our bulk status endpoint with conditional requests (ETag/If-None-Match heade",
+        "raw_score": 7,
+        "skill_score": 9,
+        "rationale": "Answer B is superior because it follows a clear structured format, uses accurate policy-grounded information (Q3 timeline, ETag/If-None-Match workaround with precise technical detail), and avoids fabricating specifics like Answer A's invented Q2 2024 date and unsupported rate limit increase offer. Answer A scores lower due to hallucinated commitments and a less actionable interim workaround, though it earns points for the beta opt-in and discovery call suggestion."
+      }
+    },
+    {
+      "id": "s4",
+      "pattern_id": "p4",
+      "name": "meeting-notes-to-action-recap",
+      "title": "Meeting Notes \u2192 Structured Action Items & Recap",
+      "description": "Transforms raw meeting notes, transcripts, or call logs into a structured recap with decisions, action items, owners, and deadlines. Supports both email-ready summaries and tracker-ready list formats.",
+      "template": "You are an expert executive assistant and project coordinator skilled at distilling meeting content into clear, accountable outputs.\n\nYour task is to analyze the meeting notes below and produce a structured recap.\n\n---\nMEETING CONTEXT\nMeeting type: {meeting_type}\nDate: {meeting_date}\nAudience for this recap: {audience}\n---\nRAW NOTES\n{raw_notes}\n---\n\nProduce the recap in the following format:\n\n## {meeting_type} Recap \u2014 {meeting_date}\n\n### Summary\nA 2\u20134 sentence plain-language overview of the meeting's purpose and outcome.\n\n### Decisions Made\nA numbered list of decisions that were finalized. If none, write \"No decisions recorded.\"\n\n### Open Questions\nA numbered list of unresolved questions or items requiring follow-up. If none, write \"None.\"\n\n### Action Items\nA table with the following columns:\n| # | Action Item | Owner | Due Date | Priority |\n|---|-------------|-------|----------|----------|\nFor any missing owner, write \"TBD\". For any missing due date, write \"TBD\". Priority should be High / Medium / Low \u2014 infer from context if not stated.\n\n### Notes & Context\nAny important background, risks, or dependencies mentioned that don't fit the above categories.\n\n---\nCONSTRAINTS:\n- Do not invent owners, dates, or decisions not supported by the notes.\n- If information is ambiguous, flag it with [UNCLEAR] inline rather than guessing.\n- Keep action items atomic \u2014 one task per row, no bundling.\n- Output format: {output_format}\n- Tone: {tone}",
+      "parameters": [
+        {
+          "name": "meeting_type",
+          "description": "The type or name of the meeting (e.g., 'Sprint Planning', 'QBR', 'Architecture Review', 'Customer Call', 'Budget Planning')."
+        },
+        {
+          "name": "meeting_date",
+          "description": "The date the meeting took place (e.g., '2025-07-14' or 'July 14, 2025'). Use 'Unknown' if not available."
+        },
+        {
+          "name": "audience",
+          "description": "Who will receive this recap (e.g., 'engineering team', 'executive stakeholders', 'project tracker / Jira', 'external client'). Influences level of detail and tone."
+        },
+        {
+          "name": "raw_notes",
+          "description": "The full unedited meeting notes, transcript, or call log to be processed."
+        },
+        {
+          "name": "output_format",
+          "description": "Desired delivery format. Options: 'email-ready' (prose headers, polished), 'tracker-ready' (terse, optimized for copy-paste into a spreadsheet or PM tool), or 'slack-ready' (concise, emoji-friendly bullets)."
+        },
+        {
+          "name": "tone",
+          "description": "Writing tone for the recap. Options: 'formal', 'professional-casual', 'concise'. Default to 'professional-casual' if unsure."
+        }
+      ],
+      "example_invocation": "You are an expert executive assistant and project coordinator skilled at distilling meeting content into clear, accountable outputs.\n\nYour task is to analyze the meeting notes below and produce a structured recap.\n\n---\nMEETING CONTEXT\nMeeting type: Q3 Budget Planning\nDate: July 14, 2025\nAudience: Finance team and department heads\n---\nRAW NOTES\nAttendees: Sarah (Finance), Marcus (Engineering), Priya (Product), Tom (Design)\n\nSarah opened by saying we're 12% over Q2 actuals. Marcus said engineering needs $40k for new infra but can defer $15k of it to Q4. Priya pushed back \u2014 said product tooling budget shouldn't be cut, it's blocking two roadmap items. Tom said design is fine, no changes needed. Sarah said she needs final numbers from each team by Friday EOD. Marcus agreed to send revised infra breakdown by Thursday. Priya will loop in her director before committing. Open question: do we need CFO sign-off if total reallocation exceeds $50k? Sarah thinks yes but needs to confirm. Next sync scheduled for Monday July 21.\n---\n\nProduce the recap in the following format:\n\n## Q3 Budget Planning Recap \u2014 July 14, 2025\n\n### Summary\nA 2\u20134 sentence plain-language overview of the meeting's purpose and outcome.\n\n### Decisions Made\nA numbered list of decisions that were finalized. If none, write \"No decisions recorded.\"\n\n### Open Questions\nA numbered list of unresolved questions or items requiring follow-up. If none, write \"None.\"\n\n### Action Items\nA table with the following columns:\n| # | Action Item | Owner | Due Date | Priority |\n|---|-------------|-------|----------|----------|\nFor any missing owner, write \"TBD\". For any missing due date, write \"TBD\". Priority should be High / Medium / Low \u2014 infer from context if not stated.\n\n### Notes & Context\nAny important background, risks, or dependencies mentioned that don't fit the above categories.\n\n---\nCONSTRAINTS:\n- Do not invent owners, dates, or decisions not supported by the notes.\n- If information is ambiguous, flag it with [UNCLEAR] inline rather than guessing.\n- Keep action items atomic \u2014 one task per row, no bundling.\n- Output format: email-ready\n- Tone: professional-casual",
+      "value": {
+        "users_covered": 10,
+        "prompt_count_14d": 23,
+        "prompts_per_month_est": 49,
+        "est_monthly_tokens": 40035,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 3823,
+        "priority": "high"
+      },
+      "quality_ab": null
+    },
+    {
+      "id": "s5",
+      "pattern_id": "p5",
+      "name": "code-pr-review-summary",
+      "title": "Code / PR Review Summary",
+      "description": "Summarizes a code diff or pull request by highlighting what changed, flagging risks, and identifying test coverage gaps. Works across any language or infrastructure-as-code format.",
+      "template": "You are a senior {language} engineer conducting a pull request review.\n\nAnalyze the following diff and produce a structured review summary.\n\n<diff>\n{diff}\n</diff>\n\n<context>\nPR Title / Branch: {pr_title}\nAudience: {audience}\n</context>\n\nRespond using EXACTLY this structure \u2014 no extra sections, no filler:\n\n## Summary\nOne or two sentences describing the overall purpose of this change.\n\n## What Changed\nBullet list of the key modifications (logic, structure, config, dependencies). Be specific \u2014 reference function names, resource names, or file paths where relevant.\n\n## Risks & Concerns\nBullet list of anything that could cause bugs, regressions, security issues, performance problems, or operational incidents. If none, write \"None identified.\" Do not omit this section.\n\n## Test Coverage Assessment\nBullet list covering: what is tested, what is NOT tested, and any edge cases or failure paths left unverified. If no tests are present or modified, explicitly call that out.\n\n## Recommendation\nOne of: **Approve** / **Approve with minor comments** / **Request changes** \u2014 followed by one sentence justifying the call.\n\nConstraints:\n- Tailor technical depth and terminology to the stated audience.\n- Keep the total response under {max_length} words unless a risk genuinely requires elaboration.\n- Do not hallucinate test files or coverage that are not present in the diff.\n- Do not suggest unrelated improvements outside the scope of this diff.",
+      "parameters": [
+        {
+          "name": "language",
+          "description": "The primary language or technology in the diff (e.g. Python, Go, Terraform, TypeScript). Sets the reviewer persona and informs risk heuristics."
+        },
+        {
+          "name": "diff",
+          "description": "The raw code diff or pull request content to be reviewed. Paste the full diff between the <diff> tags."
+        },
+        {
+          "name": "pr_title",
+          "description": "The pull request title or branch name, used to anchor the summary to the stated intent of the change. Use 'Unknown' if not available."
+        },
+        {
+          "name": "audience",
+          "description": "Who will read this summary and how it will be used (e.g. 'engineering team standup \u2014 keep it concise', 'security review board', 'junior developer learning the codebase')."
+        },
+        {
+          "name": "max_length",
+          "description": "Approximate word cap for the entire response, used to control verbosity (e.g. 300 for a standup, 600 for a detailed review)."
+        }
+      ],
+      "example_invocation": "You are a senior Go engineer conducting a pull request review.\n\nAnalyze the following diff and produce a structured review summary.\n\n<diff>\ndiff --git a/internal/auth/token.go b/internal/auth/token.go\nindex 3a1c2f0..9b4e812 100644\n--- a/internal/auth/token.go\n+++ b/internal/auth/token.go\n@@ -42,7 +42,10 @@ func ValidateToken(tokenString string) (*Claims, error) {\n-       if claims.ExpiresAt < time.Now().Unix() {\n+       now := time.Now().Unix()\n+       if claims.ExpiresAt < now || claims.IssuedAt > now {\n            return nil, ErrTokenExpired\n        }\n+       if claims.Issuer != expectedIssuer {\n+           return nil, ErrInvalidIssuer\n+       }\n</diff>\n\n<context>\nPR Title / Branch: fix/token-validation-hardening\nAudience: engineering team standup \u2014 keep it concise, one screen max\n</context>\n\nRespond using EXACTLY this structure \u2014 no extra sections, no filler:\n\n## Summary\nOne or two sentences describing the overall purpose of this change.\n\n## What Changed\nBullet list of the key modifications (logic, structure, config, dependencies). Be specific \u2014 reference function names, resource names, or file paths where relevant.\n\n## Risks & Concerns\nBullet list of anything that could cause bugs, regressions, security issues, performance problems, or operational incidents. If none, write \"None identified.\" Do not omit this section.\n\n## Test Coverage Assessment\nBullet list covering: what is tested, what is NOT tested, and any edge cases or failure paths left unverified. If no tests are present or modified, explicitly call that out.\n\n## Recommendation\nOne of: **Approve** / **Approve with minor comments** / **Request changes** \u2014 followed by one sentence justifying the call.\n\nConstraints:\n- Tailor technical depth and terminology to the stated audience.\n- Keep the total response under 300 words unless a risk genuinely requires elaboration.\n- Do not hallucinate test files or coverage that are not present in the diff.\n- Do not suggest unrelated improvements outside the scope of this diff.",
+      "value": {
+        "users_covered": 8,
+        "prompt_count_14d": 24,
+        "prompts_per_month_est": 51,
+        "est_monthly_tokens": 38751,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 3669,
+        "priority": "high"
+      },
+      "quality_ab": null
+    },
+    {
+      "id": "s6",
+      "pattern_id": "p6",
+      "name": "sql-analytics-query-builder",
+      "title": "SQL Analytics Query Builder",
+      "description": "Generates production-ready SQL queries for analytics tasks across any dialect (Standard SQL, Trino, Databricks/Spark SQL). Encodes best practices for joins, aggregations, filtering, deduplication, and outlier detection.",
+      "template": "You are a senior analytics engineer with deep expertise in {sql_dialect} and data warehousing best practices.\n\n## Task\nWrite a {sql_dialect} query to accomplish the following analytics goal:\n{query_goal}\n\n## Schema & Tables\n```\n{schema_description}\n```\n\n## Filters & Conditions\n{filters_and_conditions}\n\n## Output Requirements\n- Columns to include: {output_columns}\n- Sort order: {sort_order}\n- Row limit (if any): {row_limit}\n\n## Constraints\n- Use CTEs (WITH clauses) for any multi-step logic; avoid deeply nested subqueries\n- Add a brief inline comment above each CTE or major clause explaining its purpose\n- Use explicit JOIN types (INNER, LEFT, etc.) \u2014 never implicit comma joins\n- Cast or coerce data types explicitly where ambiguity exists\n- If window functions are needed, prefer them over self-joins\n- Do NOT use SELECT *; enumerate all required columns\n- Alias every table and every derived column for readability\n- Flag any assumptions made about the schema or data as a comment at the top of the query\n\n## Output Format\nReturn exactly two sections, in this order:\n1. **Assumptions** \u2014 a bullet list of any schema or data assumptions made\n2. **Query** \u2014 the final SQL query in a fenced ```sql code block```",
+      "parameters": [
+        {
+          "name": "sql_dialect",
+          "description": "The SQL dialect or engine to target, e.g. 'Standard SQL (BigQuery)', 'Trino', 'Databricks SQL / Spark SQL', 'PostgreSQL', 'Snowflake'"
+        },
+        {
+          "name": "query_goal",
+          "description": "A plain-English description of what the query must compute or retrieve, e.g. 'find duplicate orders within a 1-hour window' or 'calculate average order value by customer region'"
+        },
+        {
+          "name": "schema_description",
+          "description": "Table names and relevant columns with data types, e.g. 'orders(order_id BIGINT, customer_id BIGINT, amount DECIMAL, created_at TIMESTAMP); customers(customer_id BIGINT, region VARCHAR)'"
+        },
+        {
+          "name": "filters_and_conditions",
+          "description": "Any WHERE-clause logic, date ranges, inclusion/exclusion lists, or HAVING conditions, e.g. 'Only Q4 2023 (Oct 1 \u2013 Dec 31); exclude cancelled orders; customers must have 3+ orders'"
+        },
+        {
+          "name": "output_columns",
+          "description": "The specific columns or derived metrics to appear in the result set, e.g. 'region, total_revenue, order_count' or 'sensor_type, avg_reading, stddev_reading'"
+        },
+        {
+          "name": "sort_order",
+          "description": "How results should be ordered, e.g. 'total_revenue DESC' or 'event_timestamp DESC'. Use 'none' if ordering is not required."
+        },
+        {
+          "name": "row_limit",
+          "description": "Maximum number of rows to return, e.g. '1000', '100', or 'none' for no limit"
+        }
+      ],
+      "example_invocation": "You are a senior analytics engineer with deep expertise in Trino and data warehousing best practices.\n\n## Task\nWrite a Trino query to accomplish the following analytics goal:\nCalculate total revenue and order count by customer region for Q4 2023, restricted to customers who placed at least 3 orders in that period.\n\n## Schema & Tables\n```\norders(order_id BIGINT, customer_id BIGINT, amount DECIMAL(12,2), status VARCHAR, created_at TIMESTAMP)\ncustomers(customer_id BIGINT, full_name VARCHAR, region VARCHAR, signup_date DATE)\n```\n\n## Filters & Conditions\nOnly include orders where created_at is between 2023-10-01 and 2023-12-31 (inclusive); exclude orders where status = 'cancelled'; only include customers whose order count in the period is >= 3.\n\n## Output Requirements\n- Columns to include: region, total_revenue, order_count, avg_order_value\n- Sort order: total_revenue DESC\n- Row limit (if any): none\n\n## Constraints\n- Use CTEs (WITH clauses) for any multi-step logic; avoid deeply nested subqueries\n- Add a brief inline comment above each CTE or major clause explaining its purpose\n- Use explicit JOIN types (INNER, LEFT, etc.) \u2014 never implicit comma joins\n- Cast or coerce data types explicitly where ambiguity exists\n- If window functions are needed, prefer them over self-joins\n- Do NOT use SELECT *; enumerate all required columns\n- Alias every table and every derived column for readability\n- Flag any assumptions made about the schema or data as a comment at the top of the query\n\n## Output Format\nReturn exactly two sections, in this order:\n1. **Assumptions** \u2014 a bullet list of any schema or data assumptions made\n2. **Query** \u2014 the final SQL query in a fenced ```sql code block```",
+      "value": {
+        "users_covered": 10,
+        "prompt_count_14d": 36,
+        "prompts_per_month_est": 77,
+        "est_monthly_tokens": 57045,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 6160,
+        "priority": "high"
+      },
+      "quality_ab": {
+        "raw_prompt": "Need a query joining orders + customers to find high-value customers (>$10k lifetime) who haven't ordered in 60 days.",
+        "skill_prompt": "You are a senior analytics engineer with deep expertise in PostgreSQL and data warehousing best practices.\n\n## Task\nWrite a PostgreSQL query to accomplish the following analytics goal:\nIdentify high-value customers whose lifetime spend exceeds $10,000 but who have not placed any order in the last 60 days.\n\n## Schema & Tables\n```\norders(order_id BIGINT, customer_id BIGINT, amount DECIMAL(12,2), status VARCHAR, created_at TIMESTAMP);\ncustomers(customer_id BIGINT, full_name VARCHAR, email VARCHAR, created_at TIMESTAMP)\n```\n\n## Filters & Conditions\n- Exclude cancelled orders (status != 'cancelled') when computing lifetime spend\n- Lifetime spend must exceed $10,000\n- The customer's most recent non-cancelled order must be older than 60 days from today (i.e., last_order_date < CURRENT_DATE - INTERVAL '60 days')\n\n## Output Requirements\n- Columns to include: customer_id, full_name, email, lifetime_spend, last_order_date, days_since_last_order\n- Sort order: lifetime_spend DESC\n- Row limit (if any): none\n\n## Constraints\n- Use CTEs (WITH clauses) for any multi-step logic; avoid deeply nested subqueries\n- Add a brief inline comment above each CTE or major clause explaining its purpose\n- Use explicit JOIN types (INNER, LEFT, etc.) \u2014 never implicit comma joins\n- Cast or coerce data types explicitly where ambiguity exists\n- If window functions are needed, prefer them over self-joins\n- Do NOT use SELECT *; enumerate all required columns\n- Alias every table and every derived column for readability\n- Flag any assumptions made about the schema or data as a comment at the top of the query\n\n## Output Format\nReturn exactly two sections, in this order:\n1. **Assumptions** \u2014 a bullet list of any schema or data assumptions made\n2. **Query** \u2014 the final SQL query in a fenced ```sql code block```",
+        "raw_answer": "# High-Value Inactive Customers Query\n\n```sql\nSELECT \n    c.customer_id,\n    c.customer_name,\n    c.email,\n    SUM(o.order_amount) AS lifetime_value,\n    MAX(o.order_date) AS last_order_date,\n    DATEDIFF(DAY, MAX(o.order_date), CAST(GETDATE() AS DATE)) AS days_since_order\nFROM customers c\nINNER JOIN orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id,\n    c.customer_name,\n    c.email\nHAVING \n    SUM(o.order_amount) > 10000\n    AND MAX(o.order_date) <= DATEADD(DAY, -60, CAST(GETDATE() AS DATE))\nORDER BY lifetime_value DESC;\n```\n\n## Key Features:\n\n- **INNER JOIN**: Connects cu",
+        "skill_answer": "# Analysis\n\n## Assumptions\n\n- **Order Status Values**: The `status` column contains at least 'cancelled' as a value; we assume other statuses (e.g., 'completed', 'pending', 'shipped') represent valid, non-cancelled orders.\n- **Timestamp Precision**: The `created_at` column in both tables is a TIMESTAMP type that can be reliably compared to `CURRENT_DATE` and `CURRENT_TIMESTAMP`.\n- **Customer-Order Relationship**: Every order has a valid `customer_id` that corresponds to a row in the `customers` table (referential integrity assumed).\n- **No Duplicate Customers**: The `customers` table has a uni",
+        "raw_score": 7,
+        "skill_score": 9,
+        "rationale": "Answer A provides a functional, well-explained query with cross-dialect variants but lacks schema-specific precision (wrong column names, no status filter, no CTE structure, no explicit assumptions). Answer B fully satisfies a detailed specification with proper CTEs, inline comments, explicit assumptions, correct schema alignment, cancelled-order exclusion, and all required output columns."
+      }
+    },
+    {
+      "id": "s7",
+      "pattern_id": "p7",
+      "name": "document-report-summarizer",
+      "title": "Document & Report Summarizer",
+      "description": "Summarizes any document type (RFP, design doc, audit, legal memo, proposal, etc.) into a structured digest with configurable focus areas and output format. Eliminates vague summarization requests by enforcing an explicit role, audience, and output contract.",
+      "template": "You are a senior {analyst_role} with deep expertise in reviewing and distilling complex {document_type} documents for {target_audience}.\n\nYour task is to produce a concise, structured summary of the document provided below.\n\n<document>\n{document_content}\n</document>\n\n## Instructions\n\n1. Read the entire document carefully before writing anything.\n2. Produce a summary using EXACTLY the following output structure:\n\n### TL;DR\nOne to two sentences capturing the single most important takeaway.\n\n### Key Points\nExactly {num_bullets} bullet points covering the most critical information. Each bullet must be a complete, standalone sentence. Prioritize: {focus_areas}.\n\n### Risks / Concerns / Open Questions\nUp to 5 bullets. If none exist, write \"None identified.\"\n\n### Recommended Next Steps\nUp to 3 concrete, actionable next steps for {target_audience}. If the document is purely informational, write \"No action required.\"\n\n## Constraints\n- Write at a {reading_level} reading level.\n- Do NOT include information not present in the document \u2014 flag gaps explicitly.\n- Avoid jargon unless it is standard terminology for {target_audience}.\n- Total response must not exceed {max_words} words.\n- If the document is insufficient to answer a section, write \"Insufficient information in source document.\"",
+      "parameters": [
+        {
+          "name": "analyst_role",
+          "description": "The expert persona the model should adopt, matched to the document type (e.g., 'business analyst', 'solutions architect', 'legal analyst', 'security engineer', 'technical writer')."
+        },
+        {
+          "name": "document_type",
+          "description": "The category of document being summarized (e.g., 'RFP response', 'system design doc', 'performance audit', 'legal memo', 'vendor proposal', 'API specification', 'research paper')."
+        },
+        {
+          "name": "document_content",
+          "description": "The full raw text of the document to be summarized. Paste the entire content here."
+        },
+        {
+          "name": "target_audience",
+          "description": "Who will read the summary and make decisions from it (e.g., 'engineering leadership', 'non-technical stakeholders', 'the procurement committee', 'the on-call SRE team')."
+        },
+        {
+          "name": "num_bullets",
+          "description": "The exact number of bullet points to include in the Key Points section (e.g., 5, 7, 10)."
+        },
+        {
+          "name": "focus_areas",
+          "description": "Comma-separated list of topics or dimensions the summary must prioritize (e.g., 'architecture changes and timeline', 'pricing tiers and contract terms', 'bottlenecks and remediation options', 'what changed and legal implications')."
+        },
+        {
+          "name": "reading_level",
+          "description": "The target reading complexity (e.g., 'executive / plain English', 'technical but concise', 'graduate-level technical')."
+        },
+        {
+          "name": "max_words",
+          "description": "Hard cap on total response length in words (e.g., 300, 500, 800). Keeps summaries from ballooning."
+        }
+      ],
+      "example_invocation": "You are a senior solutions architect with deep expertise in reviewing and distilling complex vendor proposal documents for the engineering leadership and procurement committee.\n\nYour task is to produce a concise, structured summary of the document provided below.\n\n<document>\nAcme Cloud Services \u2014 Enterprise Data Platform Proposal v2.1\n\nExecutive Summary: Acme proposes a fully managed lakehouse solution built on Apache Iceberg with a 3-year contract at $420,000/year (Tier 1) or $310,000/year (Tier 2, reduced SLA). Implementation is estimated at 14 weeks. The platform includes real-time ingestion via Kafka connectors, a dbt-native transformation layer, and a Superset-based BI layer. Support is 24/7 for Tier 1, business-hours-only for Tier 2. Data residency is US-East by default; EU residency incurs a 15% surcharge. Vendor lock-in risk is moderate \u2014 proprietary metadata catalog is not exportable. References available from 3 Fortune 500 clients. Security: SOC 2 Type II certified, HIPAA-eligible with BAA add-on at $18,000/year.\n</document>\n\n## Instructions\n\n1. Read the entire document carefully before writing anything.\n2. Produce a summary using EXACTLY the following output structure:\n\n### TL;DR\nOne to two sentences capturing the single most important takeaway.\n\n### Key Points\nExactly 6 bullet points covering the most critical information. Each bullet must be a complete, standalone sentence. Prioritize: pricing tiers and contract terms, implementation timeline, support levels, lock-in risks, and compliance posture.\n\n### Risks / Concerns / Open Questions\nUp to 5 bullets. If none exist, write \"None identified.\"\n\n### Recommended Next Steps\nUp to 3 concrete, actionable next steps for the engineering leadership and procurement committee. If the document is purely informational, write \"No action required.\"\n\n## Constraints\n- Write at a executive / plain English reading level.\n- Do NOT include information not present in the document \u2014 flag gaps explicitly.\n- Avoid jargon unless it is standard terminology for the engineering leadership and procurement committee.\n- Total response must not exceed 450 words.\n- If the document is insufficient to answer a section, write \"Insufficient information in source document.\"",
+      "value": {
+        "users_covered": 11,
+        "prompt_count_14d": 17,
+        "prompts_per_month_est": 36,
+        "est_monthly_tokens": 26730,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 2536,
+        "priority": "medium"
+      },
+      "quality_ab": null
+    },
+    {
+      "id": "s8",
+      "pattern_id": "p8",
+      "name": "regex-grok-pattern-helper",
+      "title": "Regex / Grok Pattern Explainer, Debugger & Generator",
+      "description": "Explains, debugs, writes, or converts regex and Grok patterns for log parsing and text extraction. Accepts a task type, raw pattern or log sample, and target fields to produce annotated breakdowns, working patterns, and environment-specific guidance.",
+      "template": "You are an expert in regular expressions, Grok patterns, and log parsing with deep knowledge of regex flavors across Python (re/regex), JavaScript, Java, Ruby, grep (BRE/ERE), Logstash, and Elastic. You write precise, well-commented patterns and explain them clearly to engineers of varying experience levels.\n\n## Task\nTask type: {task_type}\n\n## Input\n\n### Pattern or Log Sample\n```\n{pattern_or_log_sample}\n```\n\n### Target Fields to Extract (if applicable)\n{target_fields}\n\n### Runtime Environment\n{environment}\n\n### Additional Context\n{additional_context}\n\n## Instructions\nBased on the task type, do the following:\n\n- **explain** \u2014 Break down the pattern component by component in a numbered list. For each component state: the token/construct, what it matches, and why it is written that way (e.g. why non-capturing groups, why possessive quantifiers). End with a one-sentence plain-English summary of the full pattern.\n- **debug** \u2014 Identify what is wrong or why behavior differs across environments. State the root cause, show the broken vs. fixed pattern side by side, and explain the fix.\n- **write** \u2014 Write a new pattern that extracts the specified target fields from the provided log sample. Show a named-capture version and, if applicable, a Grok version.\n- **convert** \u2014 Convert the provided pattern to the target environment noted in {environment}. Call out any syntax differences, unsupported features, or required escaping changes.\n- **improve** \u2014 Refactor the provided pattern for readability, performance, or correctness. Show old vs. new side by side with a bullet list of changes made and why.\n\n## Output Format\nStructure your response with these sections (omit any section not relevant to the task):\n\n1. **Summary** \u2014 One sentence stating what the pattern does or what you built.\n2. **Component Breakdown** \u2014 Annotated breakdown (for explain/improve/debug tasks).\n3. **Pattern(s)** \u2014 Final pattern(s) in a code block, with inline comments where the syntax allows. Include named-capture and Grok variants when writing a new pattern.\n4. **Test Cases** \u2014 2\u20133 example input strings and what the pattern matches or captures from each.\n5. **Environment Notes** \u2014 Any flags, imports, or syntax differences specific to {environment}.\n6. **Caveats & Edge Cases** \u2014 Known limitations, inputs that will fail, and recommended next steps.\n\n## Constraints\n- Never silently drop a requested capture field; if a field cannot be reliably extracted, say so explicitly.\n- Do not use catastrophic backtracking patterns (nested quantifiers over the same character class); flag if the input pattern contains them.\n- Prefer named capture groups `(?P<name>...)` in Python, `(?<name>...)` in JS/Java, and `%{SYNTAX:name}` in Grok.\n- If the log sample is ambiguous or too short to write a reliable pattern, ask one clarifying question before proceeding.\n- Keep explanations jargon-light unless {additional_context} indicates an expert audience.",
+      "parameters": [
+        {
+          "name": "task_type",
+          "description": "One of: explain | debug | write | convert | improve. Determines which workflow branch is executed."
+        },
+        {
+          "name": "pattern_or_log_sample",
+          "description": "The raw regex or Grok pattern to explain/debug/convert/improve, OR representative log lines to parse when task_type is 'write'. Paste verbatim, including whitespace."
+        },
+        {
+          "name": "target_fields",
+          "description": "Comma-separated list of field names to extract (e.g. 'transaction_id, amount, currency, status'). Write 'N/A' if the task is explain, debug, or convert only."
+        },
+        {
+          "name": "environment",
+          "description": "The runtime or tool where the pattern must work (e.g. Python re, JavaScript, Java, grep ERE, Logstash Grok, Elastic Common Schema, Ruby). Used for syntax and flag guidance."
+        },
+        {
+          "name": "additional_context",
+          "description": "Any extra background: log source/service name, volume/performance constraints, audience expertise level, or a description of the unexpected behavior being debugged. Write 'None' if not applicable."
+        }
+      ],
+      "example_invocation": "You are an expert in regular expressions, Grok patterns, and log parsing with deep knowledge of regex flavors across Python (re/regex), JavaScript, Java, Ruby, grep (BRE/ERE), Logstash, and Elastic. You write precise, well-commented patterns and explain them clearly to engineers of varying experience levels.\n\n## Task\nTask type: write\n\n## Input\n\n### Pattern or Log Sample\n```\n2024-03-15T14:32:01.847Z INFO payment-service txn_id=TXN-00482991 amount=149.99 currency=USD status=APPROVED user_id=usr_8821 latency_ms=203\n2024-03-15T14:32:02.103Z ERROR payment-service txn_id=TXN-00482992 amount=59.00 currency=EUR status=DECLINED user_id=usr_4410 latency_ms=87\n```\n\n### Target Fields to Extract (if applicable)\ntimestamp, log_level, transaction_id, amount, currency, status, user_id, latency_ms\n\n### Runtime Environment\nPython re module (ingested into a Pandas DataFrame); also provide a Logstash Grok variant for our ELK pipeline\n\n### Additional Context\nThis is the payment service log shipped from 12 microservice instances. Volume is ~50k lines/min so pattern efficiency matters. Team is mid-level Python engineers, not regex experts.",
+      "value": {
+        "users_covered": 10,
+        "prompt_count_14d": 16,
+        "prompts_per_month_est": 34,
+        "est_monthly_tokens": 28093,
+        "input_token_savings_pct": 30,
+        "est_monthly_token_savings": 2489,
+        "priority": "medium"
+      },
+      "quality_ab": null
+    }
+  ],
+  "summary": {
+    "skills_recommended": 8,
+    "prompts_consolidated": 200,
+    "prompts_consolidated_pct": 84.7,
+    "users_impacted": 30,
+    "est_monthly_token_savings_total": 31739,
+    "avg_quality_lift": "+2.3 points (top-3 A/B)"
+  }
+}

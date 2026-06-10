@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+node_modules/
+.databricks/
+
+# Local deploy config (real workspace values)
+app.local.yaml
+.databricks/

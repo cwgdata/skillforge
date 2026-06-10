@@ -1,0 +1,8 @@
+command: ['python', '-m', 'uvicorn', 'app.app:app', '--host', '0.0.0.0', '--port', '8000']
+env:
+  # Your workspace's AI Gateway base URL. Find the workspace id in any
+  # workspace URL's ?o= parameter, or on a serving endpoint's "Use endpoint"
+  # -> AI Gateway tab. Routing through this URL (not /serving-endpoints) is
+  # what populates system.ai_gateway.usage.
+  - name: 'AI_GATEWAY_URL'
+    value: 'https://YOUR_WORKSPACE_ID.ai-gateway.cloud.databricks.com/mlflow/v1'
