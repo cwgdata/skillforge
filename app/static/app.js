@@ -100,8 +100,11 @@ async function init() {
   renderBench(res);
   renderInject();
   loadCoverage();
+  loadCost();
   reloadCharts();
   resumeRefreshIfRunning();
+  // published + adoption badges (async; re-render skills when they land)
+  Promise.all([loadPublished(), loadAdoption()]).then(() => { if (RESULTS) renderSkills(RESULTS); });
 }
 
 function wireControls() {
@@ -114,6 +117,16 @@ function wireControls() {
   if (rb && !rb.dataset.wired) {
     rb.dataset.wired = "1";
     rb.addEventListener("click", runRefresh);
+  }
+  const pi = $("#priceInput");
+  if (pi && !pi.dataset.wired) {
+    pi.dataset.wired = "1";
+    pi.addEventListener("change", loadCost);
+  }
+  const si = $("#scaleInput");
+  if (si && !si.dataset.wired) {
+    si.dataset.wired = "1";
+    si.addEventListener("change", loadCost);
   }
 }
 
@@ -533,6 +546,12 @@ function renderSkills(res) {
     const abBtn = hasAb
       ? `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Re-run A/B</button>`
       : `<button class="ghost-btn ab-btn" data-skill="${esc(s.id)}">Run quality A/B</button>`;
+    const pub = PUBLISHED[s.id];
+    const pubBtn = `<button class="ghost-btn pub-btn" data-skill="${esc(s.id)}">${pub ? "Re-publish" : "Publish to Genie Code"}</button>`;
+    const pubChip = pub ? `<span class="badge published" title="${esc(pub.path || "")}">✓ published v${pub.version}</span>` : "";
+    const adp = ADOPTION[s.id];
+    const adpChip = adp ? `<span class="badge adoption" title="${adp.adopted}/${adp.matches} matching prompts use the template">${adp.pct}% adopted</span>` : "";
+    const adpBtn = pub ? `<button class="ghost-btn adp-btn" data-skill="${esc(s.id)}">${adp ? "Re-measure adoption" : "Measure adoption"}</button>` : "";
 
     card.innerHTML =
       `<div class="top">
@@ -540,7 +559,11 @@ function renderSkills(res) {
            <div class="title">${esc(s.title || s.name)}</div>
            <div class="name-mono">${esc(s.name)}</div>
          </div>
-         ${isEmerging ? emergingBadge() : `<span class="badge prio-${prio}">${esc(prio)}</span>`}
+         <div class="badge-stack">
+           ${isEmerging ? emergingBadge() : `<span class="badge prio-${prio}">${esc(prio)}</span>`}
+           ${pubChip}
+           ${adpChip}
+         </div>
        </div>
        <div class="desc">${esc(s.description)}</div>
        ${valueChips(v)}
@@ -554,6 +577,8 @@ function renderSkills(res) {
        </details>
        <div class="ab-slot">${beforeAfter(s.quality_ab)}</div>
        <div class="skill-footer">
+         ${pubBtn}
+         ${adpBtn}
          ${abBtn}
          <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="markdown">Export .md</button>
          <button class="ghost-btn" data-export="${esc(s.id)}" data-fmt="json">.json</button>
@@ -572,6 +597,101 @@ function renderSkills(res) {
   grid.querySelectorAll(".ab-btn").forEach((b) => {
     b.addEventListener("click", () => runQualityAb(b.dataset.skill, b));
   });
+  grid.querySelectorAll(".pub-btn").forEach((b) => {
+    b.addEventListener("click", () => publishSkill(b.dataset.skill, b));
+  });
+  grid.querySelectorAll(".adp-btn").forEach((b) => {
+    b.addEventListener("click", () => measureAdoption(b.dataset.skill, b));
+  });
+}
+
+let ADOPTION = {};
+async function loadAdoption() {
+  try { ADOPTION = (await (await fetch("/api/adoption")).json()).adoption || {}; }
+  catch (e) { ADOPTION = {}; }
+}
+async function measureAdoption(skillId, btn) {
+  if (!btn) return;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span>Measuring…`;
+  try {
+    const resp = await fetch(`/api/skills/${encodeURIComponent(skillId)}/adoption?window_days=${currentWindow() || 14}`, { method: "POST" });
+    const d = await resp.json();
+    if (!resp.ok || d.error) throw new Error(d.error || "HTTP " + resp.status);
+    await loadAdoption();
+    if (RESULTS) renderSkills(RESULTS);
+    showToast(`Adoption: ${d.adoption_pct}% (${d.adopted}/${d.pattern_matches} matching prompts use the template)`, "good");
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = orig;
+    showToast("Adoption measure failed: " + e.message, "err");
+  }
+}
+
+// ---- cost & ROI ----
+function money(n) {
+  if (n == null) return "—";
+  return "$" + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
+async function loadCost() {
+  const price = Number(($("#priceInput") || {}).value) || undefined;
+  const scale = Number(($("#scaleInput") || {}).value) || undefined;
+  const qs = [];
+  if (price) qs.push("price_per_1m=" + price);
+  if (scale && scale > 1) qs.push("scale=" + scale);
+  let d;
+  try {
+    d = await (await fetch("/api/cost" + (qs.length ? "?" + qs.join("&") : ""))).json();
+  } catch (e) { return; }
+  const note = $("#costNote");
+  if (note) { note.hidden = false; note.textContent = "@ $" + d.price_per_1m + "/1M" + (d.scale > 1 ? " ×" + d.scale : "") + " — illustrative"; }
+  const k = $("#costKpis");
+  if (k) k.innerHTML =
+    `<div class="cost-kpi"><div class="big accent-green">${money(d.annual_savings)}</div><div class="lbl">Est. annual savings</div></div>` +
+    `<div class="cost-kpi"><div class="big">${money(d.monthly_savings)}</div><div class="lbl">Per month</div></div>` +
+    `<div class="cost-kpi"><div class="big">${money(d.monthly_pattern_spend)}</div><div class="lbl">Monthly spend on these patterns</div></div>`;
+  const tb = $("#costRows");
+  if (tb) {
+    tb.innerHTML = "";
+    (d.skills || []).forEach((s) => {
+      const tr = el("tr");
+      const prio = (s.priority || "low").toLowerCase();
+      tr.innerHTML =
+        `<td><div class="pname">${esc(s.title)}</div></td>` +
+        `<td><span class="badge prio-${prio}">${esc(prio)}</span></td>` +
+        `<td class="pdesc">${fmt(s.monthly_tokens)}</td>` +
+        `<td class="accent-green">${money(s.monthly_savings)}/mo</td>`;
+      tb.appendChild(tr);
+    });
+  }
+}
+
+let PUBLISHED = {};
+async function loadPublished() {
+  try {
+    const d = await (await fetch("/api/published")).json();
+    PUBLISHED = d.published || {};
+  } catch (e) { PUBLISHED = {}; }
+}
+
+async function publishSkill(skillId, btn) {
+  if (!btn) return;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span>Publishing…`;
+  try {
+    const resp = await fetch(`/api/skills/${encodeURIComponent(skillId)}/publish`, { method: "POST" });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
+    await loadPublished();
+    if (RESULTS) renderSkills(RESULTS);
+    showToast(`Published to Genie Code: ${data.path} (v${data.version})`, "good");
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = orig;
+    showToast("Publish failed: " + e.message, "err");
+  }
 }
 
 async function runQualityAb(skillId, btn) {

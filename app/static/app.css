@@ -614,3 +614,20 @@ pre.code {
   padding: 1px 6px; border-radius: 8px; background: rgba(0,179,120,0.18); color: #2bd99f; }
 .plane-badge.legacy { background: rgba(160,171,190,0.18); color: #A0ABBE; }
 .mini-link { color: #ff6a5a; font-size: 12.5px; text-decoration: underline dotted; }
+
+/* ---- publish to Genie Code ---- */
+.badge-stack { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.badge.published { background: rgba(0,179,120,0.16); color: #2bd99f; font-size: 10px; }
+.pub-btn { border-color: rgba(0,179,120,0.4) !important; color: #2bd99f !important; }
+.pub-btn:hover { background: rgba(0,179,120,0.10) !important; }
+
+/* ---- cost & ROI ---- */
+.cost-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; }
+.cost-kpis { display: flex; gap: 28px; flex-wrap: wrap; }
+.cost-kpi .big { font-size: 30px; font-weight: 700; line-height: 1.1; }
+.cost-kpi .lbl { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+.price-ctl { display: flex; flex-direction: column; gap: 3px; }
+.price-ctl label { font-size: 12px; opacity: 0.7; }
+.price-ctl input { width: 120px; padding: 6px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: inherit; font: inherit; }
+.badge.adoption { background: rgba(255,171,0,0.16); color: #ffc24d; font-size: 10px; }
+.adp-btn { border-color: rgba(255,171,0,0.4) !important; color: #ffc24d !important; }

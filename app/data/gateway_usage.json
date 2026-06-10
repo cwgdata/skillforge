@@ -5302,7 +5302,7 @@
   "source": "inference_table"
  },
  {
-  "request_id": "69e490cc-7ae1-4185-9236-487160cde87d",
+  "request_id": "ed269430-11e3-4a26-b1f9-1582e7c23982",
   "event_time": "2026-05-25T21:57:56.000Z",
   "user_email": "omar.haddad@acme-corp.com",
   "endpoint_name": "databricks-claude-sonnet-4-6",

@@ -1582,6 +1582,211 @@ def export_skill(skill_id: str, request: Request, format: str = "markdown"):
 
 
 # --------------------------------------------------------------------------- #
+# Adoption tracking
+#
+# Once a skill is published to Genie Code, are people actually USING it? We
+# can't see skill invocations directly, but we can read the live gateway feed:
+# of recent prompts that match the skill's pattern, how many follow the
+# published template's structure (= adopters) vs hand-rolled ad-hoc prompts.
+# adoption_pct drives the REALIZED (not just estimated) token savings.
+# --------------------------------------------------------------------------- #
+ADOPTION_TABLE = f"{CATALOG}.{SCHEMA}.adoption_metrics"
+
+
+@app.post("/api/skills/{skill_id}/adoption")
+def measure_adoption(skill_id: str, request: Request, window_days: int = 14):
+    res, _ = load_user_state(request)
+    skill = _find_skill(skill_id, res)
+    if skill is None:
+        return JSONResponse({"error": f"Skill '{skill_id}' not found."}, status_code=404)
+    pat = next((p for p in res.get("patterns", []) if p.get("id") == skill.get("pattern_id")), {})
+    template = skill.get("template") or ""
+    cands = _gather_candidates(request, window_days)
+    if not cands:
+        return {"skill_id": skill_id, "pattern_matches": 0, "adopted": 0,
+                "adoption_pct": 0.0, "realized_monthly_token_savings": 0, "note": "no recent prompts to measure"}
+
+    matches = adopted = 0
+    BATCH = 80
+    for start in range(0, len(cands), BATCH):
+        chunk = cands[start:start + BATCH]
+        numbered = "\n".join(f"{i}. {c['prompt'][:500]}" for i, c in enumerate(chunk))
+        sys_msg = (
+            "You judge prompt adoption of a published skill. For each prompt decide: "
+            "matches_pattern (is it the same task as the skill) and uses_template (does it "
+            "follow the skill's structured template — role/sections/named params — rather than "
+            "an ad-hoc phrasing). Return ONLY JSON {\"r\": {\"<idx>\": {\"m\": bool, \"u\": bool}}}."
+        )
+        user_msg = (
+            f"SKILL: {skill.get('title')}\nPATTERN: {pat.get('name','')} — {pat.get('description','')}\n"
+            f"TEMPLATE:\n{template[:1200]}\n\nPROMPTS:\n{numbered}"
+        )
+        try:
+            out = parse_json_loose(call_fmapi_chat(
+                [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_msg}],
+                request=request, model=FMAPI_SONNET, temperature=0.1, max_tokens=4000))
+            for k, vv in (out.get("r") or {}).items():
+                if vv.get("m"):
+                    matches += 1
+                    if vv.get("u"):
+                        adopted += 1
+        except Exception:  # noqa: BLE001 — skip a bad batch rather than fail the whole measure
+            continue
+
+    pct = round(100.0 * adopted / matches, 1) if matches else 0.0
+    est_saved = int((skill.get("value", {}) or {}).get("est_monthly_token_savings") or 0)
+    realized = int(est_saved * (adopted / matches)) if matches else 0
+    try:
+        run_sql(f"DELETE FROM {ADOPTION_TABLE} WHERE skill_id = {sql_str(skill_id)}", request=request)
+        run_sql(
+            f"INSERT INTO {ADOPTION_TABLE} (skill_id, measured_at, window_days, pattern_matches, adopted, adoption_pct, realized_monthly_token_savings) "
+            f"VALUES ({sql_str(skill_id)}, now(), {int(window_days)}, {matches}, {adopted}, {pct}, {realized})",
+            request=request)
+    except Exception:  # noqa: BLE001
+        pass
+    return {"skill_id": skill_id, "pattern_matches": matches, "adopted": adopted,
+            "adoption_pct": pct, "realized_monthly_token_savings": realized,
+            "note": "Adoption = recent pattern-matching prompts that follow the published template's structure."}
+
+
+@app.get("/api/adoption")
+def list_adoption(request: Request):
+    try:
+        rows = run_sql(
+            f"SELECT skill_id, adoption_pct, adopted, pattern_matches, realized_monthly_token_savings, cast(measured_at as string) FROM {ADOPTION_TABLE}",
+            request=request)
+        return {"adoption": {r[0]: {"pct": r[1], "adopted": r[2], "matches": r[3],
+                "realized": r[4], "at": r[5]} for r in rows if r and r[0]}}
+    except Exception:  # noqa: BLE001
+        return {"adoption": {}}
+
+
+# --------------------------------------------------------------------------- #
+# Cost & ROI analytics
+# --------------------------------------------------------------------------- #
+# Blended $ per 1M input tokens. Pay-per-token FMAPI is DBU-priced and varies by
+# model/contract, so this is an ILLUSTRATIVE default — override per deployment
+# with SKILLFORGE_PRICE_PER_1M, or per request with ?price_per_1m=.
+DEFAULT_PRICE_PER_1M = float(os.environ.get("SKILLFORGE_PRICE_PER_1M", "2.50"))
+
+
+@app.get("/api/cost")
+def cost(request: Request, price_per_1m: float | None = None, scale: float | None = None):
+    price = price_per_1m if price_per_1m and price_per_1m > 0 else DEFAULT_PRICE_PER_1M
+    # Org-projection multiplier: the mined corpus is a sample; `scale` extrapolates
+    # to real traffic volume (e.g. if this is ~1% of prod, scale=100). Default 1.
+    scale = scale if scale and scale > 0 else 1.0
+    res, _ = load_user_state(request)
+    rows, tot_saved, tot_spend = [], 0, 0
+    for s in res.get("skills", []):
+        v = s.get("value", {}) or {}
+        saved = int(v.get("est_monthly_token_savings") or 0)
+        spend = int(v.get("est_monthly_tokens") or 0)
+        rows.append({
+            "id": s.get("id"), "title": s.get("title") or s.get("name"),
+            "priority": v.get("priority"),
+            "monthly_tokens": int(spend * scale), "monthly_tokens_saved": int(saved * scale),
+            "monthly_cost": round(spend * scale / 1e6 * price, 2),
+            "monthly_savings": round(saved * scale / 1e6 * price, 2),
+        })
+        tot_saved += saved
+        tot_spend += spend
+    monthly = round(tot_saved * scale / 1e6 * price, 2)
+    return {
+        "price_per_1m": price, "scale": scale, "currency": "USD",
+        "monthly_pattern_spend": round(tot_spend * scale / 1e6 * price, 2),
+        "monthly_savings": monthly, "annual_savings": round(monthly * 12, 2),
+        "skills": sorted(rows, key=lambda r: -r["monthly_savings"]),
+        "note": "Illustrative blended rate × org-projection scale. Defaults are the mined sample at $%.2f/1M." % price,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Publish to Genie Code (native skills: SKILL.md under .assistant/skills/)
+# --------------------------------------------------------------------------- #
+PUBLISHED_TABLE = f"{CATALOG}.{SCHEMA}.published_skills"
+# Workspace-files root where Genie Code auto-discovers skills in Agent mode.
+SKILLS_ROOT = os.environ.get("SKILLFORGE_SKILLS_ROOT", "/Workspace/.assistant/skills")
+
+
+def _ws_api(method, path, body, request):
+    """Call a Workspace REST API with OBO->SP token fallback."""
+    resp = None
+    for token in token_candidates(request):
+        resp = requests.request(
+            method, WORKSPACE_HOST + path, json=body,
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            timeout=30,
+        )
+        if resp.status_code not in (401, 403):
+            break
+    try:
+        return resp.status_code, resp.json()
+    except Exception:  # noqa: BLE001
+        return resp.status_code, resp.text[:200]
+
+
+@app.post("/api/skills/{skill_id}/publish")
+def publish_skill(skill_id: str, request: Request):
+    """Write the skill as a Genie Code SKILL.md into the workspace skills dir so
+    Genie Code Agent mode auto-discovers it; record it in published_skills."""
+    import base64
+    res, _ = load_user_state(request)
+    skill = _find_skill(skill_id, res)
+    if skill is None:
+        return JSONResponse({"error": f"Skill '{skill_id}' not found."}, status_code=404)
+    name = skill.get("name") or skill.get("id") or "skill"
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-") or "skill"
+    folder = f"{SKILLS_ROOT}/{safe}"
+    md = _skill_markdown(skill, res)
+
+    # mkdirs (idempotent — ok if it already exists) then import the SKILL.md.
+    _ws_api("POST", "/api/2.0/workspace/mkdirs", {"path": folder}, request)
+    c, b = _ws_api("POST", "/api/2.0/workspace/import", {
+        "path": f"{folder}/SKILL.md",
+        "format": "RAW",
+        "content": base64.b64encode(md.encode()).decode(),
+        "overwrite": True,
+    }, request)
+    if c not in (200, 201):
+        return JSONResponse({"error": f"import failed: {b}"}, status_code=502)
+
+    who = (request_identity(request).get("email") or "app").replace("'", "")
+    path = f"{folder}/SKILL.md"
+    try:
+        run_sql(
+            f"CREATE TABLE IF NOT EXISTS {PUBLISHED_TABLE} (skill_id STRING, name STRING, "
+            "title STRING, workspace_path STRING, version INT, published_at TIMESTAMP, published_by STRING)",
+            request=request,
+        )
+        prev = run_sql(f"SELECT max(version) FROM {PUBLISHED_TABLE} WHERE skill_id = {sql_str(skill_id)}", request=request)
+        ver = (int(prev[0][0]) + 1) if prev and prev[0] and prev[0][0] is not None else 1
+        run_sql(f"DELETE FROM {PUBLISHED_TABLE} WHERE skill_id = {sql_str(skill_id)}", request=request)
+        run_sql(
+            f"INSERT INTO {PUBLISHED_TABLE} (skill_id, name, title, workspace_path, version, published_at, published_by) "
+            f"VALUES ({sql_str(skill_id)}, {sql_str(name)}, {sql_str(skill.get('title') or name)}, "
+            f"{sql_str(path)}, {ver}, now(), {sql_str(who)})",
+            request=request,
+        )
+    except Exception as exc:  # noqa: BLE001 — file is written; tracking is best-effort
+        return {"published": True, "path": path, "version": None, "persist_warning": str(exc)[:200]}
+    return {"published": True, "path": path, "version": ver, "by": who}
+
+
+@app.get("/api/published")
+def list_published(request: Request):
+    """skill_id -> {version, path, published_at} for published-state badges."""
+    try:
+        rows = run_sql(
+            f"SELECT skill_id, version, workspace_path, cast(published_at as string) FROM {PUBLISHED_TABLE}",
+            request=request,
+        )
+        return {"published": {r[0]: {"version": r[1], "path": r[2], "at": r[3]} for r in rows if r and r[0]}}
+    except Exception:  # noqa: BLE001 — table may not exist yet
+        return {"published": {}}
+
+
+# --------------------------------------------------------------------------- #
 # On-demand quality A/B
 # --------------------------------------------------------------------------- #
 class QualityABRequest(BaseModel):

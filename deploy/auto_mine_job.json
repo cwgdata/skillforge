@@ -1,0 +1,27 @@
+{
+  "name": "skillforge-auto-mine",
+  "description": "Periodically re-mines the live AI Gateway inference data and records a time-series snapshot into skillforge.core.mining_history (powers the app's patterns-over-time panel). Serverless notebook task; uses the notebook's own credentials for SQL + FMAPI. No PAT.",
+  "tags": {
+    "project": "skillforge",
+    "owner": "cliff.gilmore@databricks.com"
+  },
+  "tasks": [
+    {
+      "task_key": "auto_mine",
+      "notebook_task": {
+        "notebook_path": "/Users/cliff.gilmore@databricks.com/skillforge-auto-mine",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 3600
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 8 * * ?",
+    "timezone_id": "America/Los_Angeles",
+    "pause_status": "UNPAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "queue": {
+    "enabled": true
+  }
+}
