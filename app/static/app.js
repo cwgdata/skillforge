@@ -101,6 +101,7 @@ async function init() {
   renderInject();
   loadCoverage();
   loadCost();
+  loadHistory();
   reloadCharts();
   resumeRefreshIfRunning();
   // published + adoption badges (async; re-render skills when they land)
@@ -627,6 +628,32 @@ async function measureAdoption(skillId, btn) {
     btn.textContent = orig;
     showToast("Adoption measure failed: " + e.message, "err");
   }
+}
+
+// ---- mining history trend ----
+let historyChart = null;
+async function loadHistory() {
+  let d;
+  try { d = await (await fetch("/api/history")).json(); } catch (e) { return; }
+  const runs = (d.runs || []);
+  const sec = $("#sec-history");
+  if (runs.length < 2) { if (sec) sec.hidden = true; return; }  // need ≥2 points to trend
+  if (sec) sec.hidden = false;
+  const note = $("#historyNote");
+  if (note) { note.hidden = false; note.textContent = runs.length + " runs"; }
+  const labels = runs.map((r) => (r.at || "").slice(5, 16));
+  const ctx = document.getElementById("chartHistory");
+  if (!ctx) return;
+  if (historyChart) historyChart.destroy();
+  historyChart = new Chart(ctx, {
+    type: "line",
+    data: { labels, datasets: [
+      { label: "Patterns", data: runs.map((r) => r.patterns), borderColor: "#FF3620", tension: 0.3 },
+      { label: "Skills", data: runs.map((r) => r.skills), borderColor: "#00B378", tension: 0.3 },
+    ]},
+    options: { plugins: { legend: { labels: { color: "#9eb7be" } } },
+      scales: { x: { ticks: { color: "#9eb7be" } }, y: { ticks: { color: "#9eb7be" }, beginAtZero: true } } },
+  });
 }
 
 // ---- cost & ROI ----

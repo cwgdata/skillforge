@@ -1582,6 +1582,25 @@ def export_skill(skill_id: str, request: Request, format: str = "markdown"):
 
 
 # --------------------------------------------------------------------------- #
+# Mining history (populated by the scheduled skillforge-auto-mine Job)
+# --------------------------------------------------------------------------- #
+HISTORY_TABLE = f"{CATALOG}.{SCHEMA}.mining_history"
+
+
+@app.get("/api/history")
+def mining_history(request: Request):
+    try:
+        rows = run_sql(
+            "SELECT cast(snapshot_at as string), total_prompts, pattern_count, "
+            f"skill_count, consolidated_pct FROM {HISTORY_TABLE} ORDER BY snapshot_at",
+            request=request)
+        return {"runs": [{"at": r[0], "prompts": r[1], "patterns": r[2],
+                "skills": r[3], "consolidated_pct": r[4]} for r in rows]}
+    except Exception:  # noqa: BLE001 — table exists only once auto-mine has run
+        return {"runs": []}
+
+
+# --------------------------------------------------------------------------- #
 # Adoption tracking
 #
 # Once a skill is published to Genie Code, are people actually USING it? We
