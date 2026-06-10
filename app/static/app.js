@@ -72,8 +72,19 @@ async function init() {
   // header controls work even in pending state
   wireControls();
 
+  // reflect the per-user view state (personal overlay vs shared baseline)
+  renderViewLine(res && res.view);
+
   if (!res || res.status === "pending") {
     $("#pending").classList.remove("hidden");
+    const bl = res && res.backlog;
+    const blEl = document.getElementById("pendingBacklog");
+    if (bl && blEl) {
+      const parts = [`${fmt(bl.snapshot_prompts || 0)} prompts captured`];
+      if (bl.injected_prompts != null) parts.push(`${fmt(bl.injected_prompts)} injected`);
+      blEl.textContent = parts.join(" · ") + " — waiting to be mined.";
+      blEl.hidden = false;
+    }
     return;
   }
   RESULTS = res;
@@ -125,6 +136,49 @@ async function loadIdentity() {
   } else {
     badge.textContent = "LOCAL";
     badge.className = "id-badge sp";
+  }
+}
+
+// ---- per-user view (personal overlay vs shared baseline) ----
+// Shows a violet "personal view" line with a Reset link only when the user has
+// a personal overlay; nothing extra on the shared baseline.
+function renderViewLine(view) {
+  const line = $("#viewLine");
+  if (!line) return;
+  const personal = !!(view && view.personal);
+  line.hidden = !personal;
+  const reset = $("#viewReset");
+  if (reset && !reset.dataset.wired) {
+    reset.dataset.wired = "1";
+    reset.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetView();
+    });
+  }
+}
+
+async function resetView() {
+  if (!confirm("Reset your personal view back to the shared baseline? Your refreshed classifications, emerging patterns/skills and A/B results will be discarded.")) {
+    return;
+  }
+  try {
+    const resp = await fetch("/api/state/reset", { method: "POST" });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
+    // full re-render from the (now baseline) results
+    const fresh = await (await fetch("/api/results")).json();
+    renderViewLine(fresh && fresh.view);
+    if (fresh && fresh.status !== "pending") {
+      RESULTS = fresh;
+      renderKpis(fresh);
+      renderPatterns(fresh);
+      renderSkills(fresh);
+      renderBench(fresh);
+    }
+    reloadCharts();
+    showToast("View reset to the shared baseline.", "");
+  } catch (e) {
+    showToast("Reset failed: " + e.message, "err");
   }
 }
 
@@ -281,6 +335,7 @@ async function refreshDone(st) {
   // full re-render from fresh results
   try {
     const fresh = await (await fetch("/api/results")).json();
+    renderViewLine(fresh && fresh.view);
     if (fresh && fresh.status !== "pending") {
       RESULTS = fresh;
       renderKpis(fresh);
@@ -527,6 +582,7 @@ async function runQualityAb(skillId, btn) {
     if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
     // refetch results and re-render so the card shows the Before/After panel
     const fresh = await (await fetch("/api/results")).json();
+    renderViewLine(fresh && fresh.view);
     if (fresh && fresh.status !== "pending") {
       RESULTS = fresh;
       renderSkills(fresh);
@@ -829,3 +885,35 @@ function wireSidebar() {
   document.querySelectorAll("section.section[id]").forEach((s) => obs.observe(s));
 }
 document.addEventListener("DOMContentLoaded", wireSidebar);
+
+
+// ---- clear injected-prompt history (destructive, warned) ----
+function wireInjectClear() {
+  const btn = document.getElementById("injectClear");
+  if (!btn || btn.dataset.wired) return;
+  btn.dataset.wired = "1";
+  btn.addEventListener("click", async () => {
+    const ok = confirm(
+      "Clear prompt history?\n\n" +
+      "This permanently deletes ALL injected prompts from the shared " +
+      "injected_prompts table — for every user, not just you. Prompts already " +
+      "classified into patterns are not un-counted, and gateway usage / " +
+      "inference tables are untouched.\n\nThis cannot be undone."
+    );
+    if (!ok) return;
+    btn.disabled = true;
+    try {
+      const resp = await fetch("/api/inject/clear", { method: "POST" });
+      const out = await resp.json();
+      if (!resp.ok || out.error) throw new Error(out.error || "HTTP " + resp.status);
+      showToast(`Prompt history cleared (${fmt(out.cleared)} prompts removed).`, "good");
+      const outEl = document.getElementById("injectOut");
+      if (outEl) outEl.innerHTML = "";
+    } catch (err) {
+      showToast("Clear failed: " + err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", wireInjectClear);

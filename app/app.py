@@ -60,6 +60,10 @@ SCHEMA = os.environ.get("SKILLFORGE_SCHEMA", "skillforge")
 INFERENCE_TABLE = f"{CATALOG}.{SCHEMA}.fmapi_haiku_payload"
 INJECTED_TABLE = f"{CATALOG}.{SCHEMA}.injected_prompts"
 MINING_TABLE = f"{CATALOG}.{SCHEMA}.mining_config"
+# Per-user runtime overlay (results_doc / assignments_doc). The baseline
+# results.json shipped with the app is shared + READ-ONLY; everything a user
+# mutates at runtime lives in one row of this table, keyed by user_email.
+USER_STATE_TABLE = f"{CATALOG}.{SCHEMA}.user_state"
 
 app = FastAPI(title="SkillForge")
 
@@ -128,6 +132,173 @@ class _TokenShim:
 
     def __init__(self, obo_token):
         self.headers = {"x-forwarded-access-token": obo_token} if obo_token else {}
+
+
+# --------------------------------------------------------------------------- #
+# Per-user state layer
+#
+# Each signed-in user gets their OWN analysis view. The baseline results.json
+# (and an empty assignments map) is the shared, READ-ONLY starting point;
+# everything a user changes at runtime — refresh classification, emerging
+# patterns/skills, on-demand quality_ab — lives in a per-user overlay persisted
+# to the {CATALOG}.{SCHEMA}.user_state UC table. We keep an in-process
+# write-through cache (dict + lock) so repeated reads don't hit UC.
+# --------------------------------------------------------------------------- #
+# user_key -> {"results": dict, "assignments": dict, "overlay": bool}. Whole-
+# entry swaps under the lock keep readers from observing a half-updated overlay.
+# "overlay" distinguishes a real personal overlay (a row exists / will be
+# written) from a cached baseline fallback (read-through that hasn't mutated
+# anything) — only the former counts as a "personal view".
+_USER_STATE_CACHE = {}
+_USER_STATE_LOCK = threading.Lock()
+
+
+def user_key(request):
+    """Stable per-user key: the signed-in email (lowercased).
+
+    Falls back to "service-principal" in-app when there is no OBO identity, and
+    "local-dev" when running outside Databricks Apps.
+    """
+    ident = request_identity(request)
+    email = (ident.get("email") or "").strip().lower()
+    if email:
+        return email
+    if IS_DATABRICKS_APP:
+        return "service-principal"
+    return "local-dev"
+
+
+def _parse_doc(raw, fallback):
+    """Defensively parse a JSON doc string from UC; fall back on any error."""
+    if raw is None:
+        return fallback
+    if isinstance(raw, dict):
+        return raw
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else fallback
+    except (json.JSONDecodeError, TypeError):
+        return fallback
+
+
+def load_user_state(request):
+    """Return (results_doc, assignments_doc) for the current user.
+
+    Cache first; else SELECT the user's row from user_state; else fall back to
+    the shared baseline (results.json + empty assignments). The returned dicts
+    are the live cache copies — callers mutate then call save_user_state.
+    """
+    key = user_key(request)
+    with _USER_STATE_LOCK:
+        cached = _USER_STATE_CACHE.get(key)
+        if cached is not None:
+            return cached["results"], cached["assignments"]
+
+    results_doc = None
+    assignments_doc = None
+    overlay = False
+    try:
+        rows = run_sql(
+            f"SELECT results_doc, assignments_doc FROM {USER_STATE_TABLE} "
+            f"WHERE user_email = {sql_str(key)}",
+            request=request,
+        )
+        if rows and rows[0]:
+            results_doc = _parse_doc(rows[0][0], None)
+            assignments_doc = _parse_doc(rows[0][1] if len(rows[0]) > 1 else None, None)
+            overlay = results_doc is not None
+    except Exception:  # noqa: BLE001 — table may be unreachable; use baseline
+        results_doc = None
+        assignments_doc = None
+
+    if results_doc is None:
+        results_doc = load_results()
+    if assignments_doc is None:
+        assignments_doc = load_assignments()
+
+    with _USER_STATE_LOCK:
+        # Another thread may have populated the cache while we hit UC; re-check.
+        cached = _USER_STATE_CACHE.get(key)
+        if cached is not None:
+            return cached["results"], cached["assignments"]
+        _USER_STATE_CACHE[key] = {
+            "results": results_doc,
+            "assignments": assignments_doc,
+            "overlay": overlay,
+        }
+    return results_doc, assignments_doc
+
+
+def has_user_overlay(request):
+    """True if this user has a real personal overlay (a UC row / pending write).
+
+    A cached baseline fallback (a pure read-through that mutated nothing) does
+    NOT count — only entries flagged overlay=True, or a row in UC, do.
+    """
+    key = user_key(request)
+    with _USER_STATE_LOCK:
+        cached = _USER_STATE_CACHE.get(key)
+        if cached is not None:
+            return bool(cached.get("overlay"))
+    try:
+        rows = run_sql(
+            f"SELECT 1 FROM {USER_STATE_TABLE} WHERE user_email = {sql_str(key)} LIMIT 1",
+            request=request,
+        )
+        return bool(rows)
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def save_user_state(request, results_doc, assignments_doc, key=None):
+    """Cache update + UC upsert of the user's overlay.
+
+    The in-memory cache is updated atomically (whole-tuple swap under the lock)
+    regardless of UC outcome. The UC write runs in the calling thread (the
+    refresh path already runs in a background thread, which is fine). Returns a
+    "persist_warning" string on UC failure, else None — callers fold it into
+    their response rather than failing the request.
+    """
+    if key is None:
+        key = user_key(request)
+    with _USER_STATE_LOCK:
+        _USER_STATE_CACHE[key] = {
+            "results": results_doc,
+            "assignments": assignments_doc,
+            "overlay": True,
+        }
+
+    rdoc = json.dumps(results_doc, separators=(",", ":"))
+    adoc = json.dumps(assignments_doc, separators=(",", ":"))
+    try:
+        run_sql(
+            f"DELETE FROM {USER_STATE_TABLE} WHERE user_email = {sql_str(key)}",
+            request=request,
+        )
+        run_sql(
+            f"INSERT INTO {USER_STATE_TABLE} "
+            f"(user_email, results_doc, assignments_doc, updated_at) "
+            f"VALUES ({sql_str(key)}, {sql_str(rdoc)}, {sql_str(adoc)}, now())",
+            request=request,
+        )
+    except Exception as exc:  # noqa: BLE001 — keep cache, surface a warning
+        return f"State persisted in-memory only (UC write failed: {str(exc)[:200]})"
+    return None
+
+
+def reset_user_state(request):
+    """Drop the user's overlay from the cache and UC. Returns persist_warning."""
+    key = user_key(request)
+    with _USER_STATE_LOCK:
+        _USER_STATE_CACHE.pop(key, None)
+    try:
+        run_sql(
+            f"DELETE FROM {USER_STATE_TABLE} WHERE user_email = {sql_str(key)}",
+            request=request,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return f"Cache cleared; UC delete failed: {str(exc)[:200]}"
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -375,15 +546,44 @@ def health():
 
 
 @app.get("/api/results")
-def results():
-    return JSONResponse(load_results())
+def results(request: Request):
+    results_doc, _ = load_user_state(request)
+    # The shipped baseline's generated_at, surfaced so the UI can show when the
+    # shared engine baseline was produced even on a personalized view.
+    baseline = load_results()
+    baseline_generated_at = (
+        baseline.get("generated_at") if isinstance(baseline, dict) else None
+    )
+    personal = has_user_overlay(request)
+    out = dict(results_doc) if isinstance(results_doc, dict) else {"status": "pending"}
+    if out.get("status") == "pending":
+        # Surface how much traffic is already waiting to be mined: the bundled
+        # usage snapshot plus (best-effort) live injected prompts.
+        backlog = {"snapshot_prompts": len(load_usage()), "injected_prompts": None}
+        try:
+            rows = run_sql(f"SELECT count(*) FROM {INJECTED_TABLE}", request=request)
+            backlog["injected_prompts"] = int(rows[0][0]) if rows and rows[0] else 0
+        except Exception:  # noqa: BLE001 — table may not exist yet
+            pass
+        out["backlog"] = backlog
+    out["view"] = {
+        "user": user_key(request),
+        "personal": bool(personal),
+        "baseline_generated_at": baseline_generated_at,
+    }
+    return JSONResponse(out)
 
 
 @app.get("/api/whoami")
 def whoami(request: Request):
     ident = request_identity(request)
+    personal = has_user_overlay(request)
     if ident["auth_mode"] in ("obo", "service_principal"):
-        return {"email": ident["email"] or "service-principal", "auth_mode": ident["auth_mode"]}
+        return {
+            "email": ident["email"] or "service-principal",
+            "auth_mode": ident["auth_mode"],
+            "personal_view": bool(personal),
+        }
     # Local mode: resolve the current user via SCIM /Me (5s timeout, fallbacks).
     email = "local-dev"
     try:
@@ -397,7 +597,7 @@ def whoami(request: Request):
             email = resp.json().get("userName") or "local-dev"
     except Exception:  # noqa: BLE001
         email = "unknown"
-    return {"email": email, "auth_mode": "local"}
+    return {"email": email, "auth_mode": "local", "personal_view": bool(personal)}
 
 
 def _usage_stats_snapshot(window_days, source="snapshot"):
@@ -510,8 +710,8 @@ class TestSkillRequest(BaseModel):
 
 @app.post("/api/test_skill")
 def test_skill(req: TestSkillRequest, request: Request):
-    res = load_results()
-    if res.get("status") == "pending":
+    res, _ = load_user_state(request)
+    if not isinstance(res, dict) or res.get("status") == "pending":
         return JSONResponse(
             {"error": "Engine has not run yet — no skills available."}, status_code=409
         )
@@ -737,6 +937,24 @@ def mining_config(request: Request):
     return {"tables": tables}
 
 
+@app.post("/api/inject/clear")
+def inject_clear(request: Request):
+    """Permanently clear the shared injected-prompt history (all users' rows).
+
+    Destructive by design — the UI gates this behind an explicit warning
+    dialog. Only the injected_prompts feed is cleared; gateway usage, the
+    inference tables, and per-user analysis overlays are untouched.
+    """
+    who = (request_identity(request).get("email") or "app").replace("'", "")
+    try:
+        before = run_sql(f"SELECT count(*) FROM {INJECTED_TABLE}", request=request)
+        n = int(before[0][0]) if before and before[0] else 0
+        run_sql(f"DELETE FROM {INJECTED_TABLE}", request=request)
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": f"Could not clear history: {exc}"}, status_code=502)
+    return {"cleared": n, "by": who}
+
+
 class MiningToggle(BaseModel):
     table: str
     enabled: bool
@@ -883,6 +1101,7 @@ _REFRESH_STATUS = {
     "elapsed_s": 0,
     "result": None,
     "error": None,
+    "user": None,  # user_key that owns the in-flight / last refresh
 }
 
 
@@ -891,16 +1110,29 @@ def _set_status(**kw):
         _REFRESH_STATUS.update(kw)
 
 
-def _run_refresh(token_shim, window_days):
+def _run_refresh(token_shim, window_days, user_k):
     """Core re-classification logic. Runs in a daemon thread; updates the
     module-level _REFRESH_STATUS as it progresses. `token_shim` is a request-like
-    object carrying the captured OBO token (or empty headers → SP fallback)."""
+    object carrying the captured OBO token (or empty headers → SP fallback).
+    `user_k` is the captured user_key for whom we re-classify + persist (the
+    thread has no Request, so the caller resolves identity up front)."""
     request = token_shim
     try:
-        res = load_results()
-        if res.get("status") == "pending":
+        # Load THIS user's current overlay (cache or UC), falling back to the
+        # shared baseline. load_user_state derives its key from request identity,
+        # but the shim carries no email — so seed the cache under user_k first
+        # if it's missing, then read it back.
+        with _USER_STATE_LOCK:
+            cached = _USER_STATE_CACHE.get(user_k)
+        if cached is not None:
+            res, assignments = cached["results"], cached["assignments"]
+        else:
+            # No cached overlay → start from the shared baseline for this user.
+            res, assignments = load_results(), load_assignments()
+        if not isinstance(res, dict) or res.get("status") == "pending":
             res = {"patterns": [], "skills": [], "summary": {}, "overview": {}}
-        assignments = load_assignments()
+        if not isinstance(assignments, dict):
+            assignments = {}
 
         _set_status(phase="gathering candidates")
         candidates = _gather_candidates(request, window_days)
@@ -915,6 +1147,7 @@ def _run_refresh(token_shim, window_days):
                 "new_patterns": [],
                 "new_skills": [],
                 "window_days": window_days,
+                "user": user_k,
             }
             _set_status(state="done", phase="done", result=result)
             return
@@ -1021,13 +1254,15 @@ def _run_refresh(token_shim, window_days):
                 except Exception:  # noqa: BLE001 — skill design is best-effort
                     pass
 
-        # Recompute summary consolidation vs new total prompt count.
+        # Recompute summary consolidation vs new total prompt count. The
+        # "prompts analyzed" KPI comes from overview.total_prompts, so bump it
+        # by the candidates we just classified (previously it stayed stale).
         total_prompts = sum(p.get("prompt_count") or 0 for p in patterns)
         consolidated = total_prompts  # all clustered prompts are "consolidated"
         summary = res.setdefault("summary", {})
-        sm_overview = res.get("overview", {})
-        base_total = sm_overview.get("total_prompts") or total_prompts
-        grand_total = max(base_total, total_prompts)
+        overview = res.setdefault("overview", {})
+        overview["total_prompts"] = (overview.get("total_prompts") or 0) + len(candidates)
+        grand_total = max(overview["total_prompts"], total_prompts)
         summary["prompts_consolidated"] = consolidated
         if grand_total:
             summary["prompts_consolidated_pct"] = round(100.0 * consolidated / grand_total, 1)
@@ -1036,15 +1271,10 @@ def _run_refresh(token_shim, window_days):
         res["patterns"] = patterns
         res["refreshed_at"] = datetime.utcnow().isoformat() + "Z"
 
-        # Persist results + assignments via atomic temp-file + os.replace so
-        # concurrent readers never see partial JSON. NOTE: the Apps container FS
-        # is ephemeral — writes survive only for the life of the container.
+        # Persist this user's overlay (cache + UC upsert). The baseline
+        # results.json is NEVER written — it stays the shared read-only start.
         _set_status(phase="persisting")
-        try:
-            atomic_write_json(RESULTS_PATH, res)
-            atomic_write_json(ASSIGNMENTS_PATH, assignments)
-        except OSError:
-            pass
+        persist_warning = save_user_state(request, res, assignments, key=user_k)
 
         result = {
             "new_prompts": len(new_cands),
@@ -1053,7 +1283,10 @@ def _run_refresh(token_shim, window_days):
             "new_patterns": new_patterns_named,
             "new_skills": new_skills_named,
             "window_days": window_days,
+            "user": user_k,
         }
+        if persist_warning:
+            result["persist_warning"] = persist_warning
         _set_status(state="done", phase="done", result=result)
     except Exception as exc:  # noqa: BLE001 — record failure for the status poller
         _set_status(state="error", phase="error", error=str(exc)[:400])
@@ -1061,10 +1294,18 @@ def _run_refresh(token_shim, window_days):
 
 @app.post("/api/refresh")
 def refresh(request: Request, window_days: int = 14):
+    # Resolve the requesting user up front — the background thread has no
+    # Request, so we capture both the OBO token AND the user_key here. The job
+    # status / lock stay global-single-job (fine for the demo) but we record
+    # which user owns the in-flight refresh so /status can report it.
+    uk = user_key(request)
     # Only one refresh at a time.
     with _REFRESH_LOCK:
         if _REFRESH_STATUS["state"] == "running":
-            return JSONResponse({"error": "refresh already running"}, status_code=409)
+            return JSONResponse(
+                {"error": "refresh already running", "user": _REFRESH_STATUS.get("user")},
+                status_code=409,
+            )
         job_id = sha1(str(time.time()) + str(threading.get_ident()))[:12]
         _REFRESH_STATUS.update(
             {
@@ -1079,14 +1320,15 @@ def refresh(request: Request, window_days: int = 14):
                 "result": None,
                 "error": None,
                 "job_id": job_id,
+                "user": uk,
             }
         )
     # Capture the OBO token BEFORE the thread starts — the thread has no Request.
     obo = request.headers.get("x-forwarded-access-token") if request is not None else None
     shim = _TokenShim(obo)
-    t = threading.Thread(target=_run_refresh, args=(shim, window_days), daemon=True)
+    t = threading.Thread(target=_run_refresh, args=(shim, window_days, uk), daemon=True)
     t.start()
-    return JSONResponse({"job_id": job_id, "state": "running"}, status_code=202)
+    return JSONResponse({"job_id": job_id, "state": "running", "user": uk}, status_code=202)
 
 
 @app.get("/api/refresh/status")
@@ -1167,13 +1409,12 @@ def _design_skill(pattern, prompts_txt, users_covered, window_days, request, res
 # --------------------------------------------------------------------------- #
 # Skill export
 # --------------------------------------------------------------------------- #
-def _find_skill(skill_id):
-    res = load_results()
+def _find_skill(skill_id, res):
     skills = res.get("skills", []) if isinstance(res, dict) else []
     return next((s for s in skills if s.get("id") == skill_id), None)
 
 
-def _skill_markdown(skill):
+def _skill_markdown(skill, res):
     """Render a skill as a ready-to-install Claude Code skill markdown doc."""
     name = skill.get("name") or skill.get("id") or "skill"
     title = skill.get("title") or name
@@ -1182,8 +1423,7 @@ def _skill_markdown(skill):
     example = skill.get("example_invocation") or ""
     pattern_name = ""
     pid = skill.get("pattern_id")
-    if pid:
-        res = load_results()
+    if pid and isinstance(res, dict):
         pat = next((p for p in res.get("patterns", []) if p.get("id") == pid), None)
         if pat:
             pattern_name = pat.get("name", "")
@@ -1235,8 +1475,9 @@ def _skill_markdown(skill):
 
 
 @app.get("/api/skills/{skill_id}/export")
-def export_skill(skill_id: str, format: str = "markdown"):
-    skill = _find_skill(skill_id)
+def export_skill(skill_id: str, request: Request, format: str = "markdown"):
+    res, _ = load_user_state(request)
+    skill = _find_skill(skill_id, res)
     if skill is None:
         return JSONResponse({"error": f"Skill '{skill_id}' not found."}, status_code=404)
     name = skill.get("name") or skill.get("id") or "skill"
@@ -1248,7 +1489,7 @@ def export_skill(skill_id: str, format: str = "markdown"):
             media_type="application/json",
             headers={"Content-Disposition": f'attachment; filename="{safe}.json"'},
         )
-    md = _skill_markdown(skill)
+    md = _skill_markdown(skill, res)
     return Response(
         content=md,
         media_type="text/markdown",
@@ -1265,7 +1506,7 @@ class QualityABRequest(BaseModel):
 
 @app.post("/api/skills/{skill_id}/quality_ab")
 def quality_ab(skill_id: str, req: QualityABRequest, request: Request):
-    res = load_results()
+    res, assignments = load_user_state(request)
     if not isinstance(res, dict) or res.get("status") == "pending":
         return JSONResponse({"error": "Engine has not run yet."}, status_code=409)
     skills = res.get("skills", [])
@@ -1329,14 +1570,28 @@ def quality_ab(skill_id: str, req: QualityABRequest, request: Request):
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
-    # Persist into the skill's quality_ab in results.json (atomic write).
+    # Persist into the skill's quality_ab in the USER's overlay (cache + UC).
+    # This is the user's first mutation if they were on the shared baseline —
+    # save_user_state copies the (possibly baseline-derived) doc into their row.
     skill["quality_ab"] = ab
-    try:
-        atomic_write_json(RESULTS_PATH, res)
-    except OSError:
-        pass
-
+    persist_warning = save_user_state(request, res, assignments)
+    if persist_warning:
+        return {**ab, "persist_warning": persist_warning}
     return ab
+
+
+# --------------------------------------------------------------------------- #
+# Per-user state reset
+# --------------------------------------------------------------------------- #
+@app.post("/api/state/reset")
+def state_reset(request: Request):
+    """Drop the current user's overlay (cache + UC row) so they fall back to the
+    shared baseline view. Idempotent — a no-op if no overlay exists."""
+    persist_warning = reset_user_state(request)
+    out = {"reset": True, "user": user_key(request)}
+    if persist_warning:
+        out["persist_warning"] = persist_warning
+    return out
 
 
 # --------------------------------------------------------------------------- #

@@ -137,6 +137,28 @@ html, body {
 .id-badge.obo { background: rgba(0, 179, 120, 0.18); color: var(--green); border: 1px solid rgba(0, 179, 120, 0.4); }
 .id-badge.sp { background: rgba(255, 255, 255, 0.08); color: var(--muted); border: 1px solid var(--border); }
 
+/* per-user view line (under the identity chip) */
+.identity-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.view-line {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--muted);
+}
+.view-line[hidden] { display: none; }
+.view-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #9b8cff; box-shadow: 0 0 6px rgba(155, 140, 255, 0.7);
+  flex: 0 0 auto;
+}
+.view-label {
+  color: #b6abff; font-weight: 600; letter-spacing: 0.3px;
+  text-transform: uppercase; font-size: 10px;
+}
+.view-reset {
+  color: var(--muted2); text-decoration: none; font-weight: 600;
+  border-bottom: 1px dashed transparent; transition: color 0.15s, border-color 0.15s;
+}
+.view-reset:hover { color: var(--text); border-bottom-color: var(--border-strong); }
+
 /* ----- toast ----- */
 .toast {
   position: fixed;
@@ -578,3 +600,12 @@ pre.code {
 .switch input:checked + .slider { background: #00B378; }
 .switch input:checked + .slider::before { transform: translateX(17px); }
 .switch input:disabled + .slider { opacity: 0.5; cursor: wait; }
+
+/* ---- inject actions / danger button ---- */
+.inject-actions { display: flex; gap: 10px; align-items: center; }
+.btn.ghost.danger {
+  background: transparent; border: 1px solid rgba(255,54,32,0.45); color: #ff6a5a;
+}
+.btn.ghost.danger:hover { background: rgba(255,54,32,0.12); }
+
+.pending .backlog-line { font-weight: 600; color: #FFAB00; margin-top: 8px; }

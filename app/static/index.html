@@ -57,10 +57,17 @@
           </svg>
           <span>Refresh</span>
         </button>
-        <div class="identity-chip" id="identityChip" title="Signed-in identity">
-          <span class="avatar" id="idAvatar">?</span>
-          <span class="id-email" id="idEmail">…</span>
-          <span class="id-badge" id="idBadge"></span>
+        <div class="identity-wrap">
+          <div class="identity-chip" id="identityChip" title="Signed-in identity">
+            <span class="avatar" id="idAvatar">?</span>
+            <span class="id-email" id="idEmail">…</span>
+            <span class="id-badge" id="idBadge"></span>
+          </div>
+          <div class="view-line" id="viewLine" hidden>
+            <span class="view-dot"></span>
+            <span class="view-label">personal view</span>
+            <a href="#" class="view-reset" id="viewReset">Reset view</a>
+          </div>
         </div>
       </div>
       <div class="gen" id="genInfo"></div>
@@ -87,6 +94,7 @@
       <div class="big">&#9874;</div>
       <h3>The engine has not run yet</h3>
       <p>No <code>results.json</code> found. Once the mining pipeline finishes,<br/>discovered patterns and recommended skills will appear here.</p>
+      <p class="backlog-line" id="pendingBacklog" hidden></p>
     </div>
 
     <!-- Main dashboard -->
@@ -162,7 +170,10 @@
             <label for="injectEmail">Attribute to user email (optional)</label>
             <input id="injectEmail" placeholder="alex@acme-corp.com" />
           </div>
-          <button class="btn" id="injectRun">Send</button>
+          <div class="inject-actions">
+            <button class="btn" id="injectRun">Send</button>
+            <button class="btn ghost danger" id="injectClear" title="Delete all injected prompts">Clear prompt history</button>
+          </div>
           <div id="injectError" class="error-banner hidden"></div>
           <div id="injectOut"></div>
         </div>

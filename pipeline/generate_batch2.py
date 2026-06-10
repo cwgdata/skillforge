@@ -20,6 +20,7 @@ from pathlib import Path
 import requests
 
 from common import CATALOG, GATEWAY_URL, SCHEMA, chat_json, run_sql, sql_str, token
+from promptgen import generate_prompts
 
 random.seed(43)
 OUT = Path(__file__).parent.parent / "app" / "data"
@@ -86,20 +87,7 @@ WORKERS = 8
 
 
 def gen_variations(brief: str, n: int) -> list[str]:
-    """Same FMAPI prompt-variation generator as generate_usage.py, chunked so
-    large n (e.g. 50) stays comfortably inside the response token budget."""
-    prompts = []
-    remaining = n
-    while remaining > 0:
-        k = min(remaining, 30)
-        prompts += chat_json([{"role": "user", "content": (
-            f"Generate {k} distinct, realistic prompts that different employees would send to an internal "
-            f"LLM endpoint. Scenario: {brief} Each prompt 15-80 words, first-person, as actually typed "
-            f"(typos and shorthand occasionally OK). Include realistic pasted-content placeholders like "
-            f"<ticket text>, <diff>, <notes> where natural. Return ONLY a JSON array of {k} strings.")}],
-            max_tokens=8000)
-        remaining -= k
-    return prompts
+    return generate_prompts(brief, n)
 
 
 def make_row(prompt: str, key: str, personas: list[str] | None) -> dict:
