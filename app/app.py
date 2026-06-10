@@ -489,6 +489,22 @@ def sql_str(s):
     return "'" + str(s).replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
+# Allow hyphens: real inference tables are named e.g.
+# databricks-claude-haiku-4-5_payload. Backtick-quoting makes them safe in SQL.
+_IDENT_RE = re.compile(r"^[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+){0,2}$")
+
+
+def safe_table_ident(name):
+    """Validate a `catalog.schema.table` identifier before splicing it into a
+    FROM/WHERE clause. Scan-derived table names (from serving-endpoint configs
+    and system.ai_gateway.usage) are workspace-controllable, so reject anything
+    that isn't a plain dotted identifier. Returns a backtick-quoted form."""
+    n = (name or "").strip().strip("`")
+    if not _IDENT_RE.match(n):
+        raise ValueError(f"unsafe SQL identifier: {name!r}")
+    return ".".join(f"`{part}`" for part in n.split("."))
+
+
 def fill_template(template, parameters):
     """Fill {placeholder} tokens in template from the parameters dict.
 
@@ -917,6 +933,8 @@ def endpoints_scan(request: Request):
         # collide across workspaces, so filter to this workspace (id = the
         # gateway URL subdomain) or another workspace's config/tokens leak in.
         ws_id = AI_GATEWAY_URL.split("//")[-1].split(".")[0] if AI_GATEWAY_URL else ""
+        if not ws_id.isdigit():  # workspace id is always numeric — don't splice anything else
+            ws_id = ""
         v2rows = run_sql(
             "SELECT endpoint_name, max(endpoint_metadata.inference_table), "
             "sum(total_tokens) FROM system.ai_gateway.usage "
@@ -1013,9 +1031,15 @@ def mining_toggle(req: MiningToggle, request: Request):
         return JSONResponse({"error": f"Unknown inference table '{table}'."}, status_code=404)
     who = (request_identity(request).get("email") or "app").replace("'", "")
     try:
+        run_sql(
+            f"CREATE TABLE IF NOT EXISTS {MINING_TABLE} "
+            "(table_name STRING, enabled BOOLEAN, updated_at TIMESTAMP, updated_by STRING)",
+            request=request,
+        )
         run_sql(f"DELETE FROM {MINING_TABLE} WHERE table_name = {sql_str(table)}", request=request)
         run_sql(
-            f"INSERT INTO {MINING_TABLE} VALUES ({sql_str(table)}, {str(req.enabled).upper()}, now(), {sql_str(who)})",
+            f"INSERT INTO {MINING_TABLE} (table_name, enabled, updated_at, updated_by) "
+            f"VALUES ({sql_str(table)}, {str(req.enabled).upper()}, now(), {sql_str(who)})",
             request=request,
         )
     except Exception as exc:  # noqa: BLE001
@@ -1072,8 +1096,9 @@ def _gather_candidates(request, window_days):
     # mining_config; parse request JSON, take last user-role message
     for _mine_tbl in _enabled_mining_tables(request):
       try:
+        _safe_tbl = safe_table_ident(_mine_tbl)  # reject hostile scan-derived names
         rows = run_sql(
-            f"SELECT request, response FROM {_mine_tbl} WHERE status_code = 200",
+            f"SELECT request, response FROM {_safe_tbl} WHERE status_code = 200",
             request=request,
         )
         for row in rows:
@@ -1167,8 +1192,24 @@ def _run_refresh(token_shim, window_days, user_k):
         if cached is not None:
             res, assignments = cached["results"], cached["assignments"]
         else:
-            # No cached overlay → start from the shared baseline for this user.
-            res, assignments = load_results(), load_assignments()
+            # Cache miss (e.g. after an app restart / on another replica): the
+            # user may STILL have a persisted overlay in UC. Read it before
+            # falling back to baseline — otherwise this refresh would start from
+            # baseline and save_user_state would clobber their saved overlay.
+            res, assignments = None, None
+            try:
+                rows = run_sql(
+                    f"SELECT results_doc, assignments_doc FROM {USER_STATE_TABLE} "
+                    f"WHERE user_email = {sql_str(user_k)}",
+                    request=request,
+                )
+                if rows and rows[0]:
+                    res = _parse_doc(rows[0][0], None)
+                    assignments = _parse_doc(rows[0][1] if len(rows[0]) > 1 else None, None)
+            except Exception:  # noqa: BLE001 — table unreachable → baseline
+                res, assignments = None, None
+            if res is None:
+                res, assignments = load_results(), (assignments or load_assignments())
         if not isinstance(res, dict) or res.get("status") == "pending":
             res = {"patterns": [], "skills": [], "summary": {}, "overview": {}}
         if not isinstance(assignments, dict):
@@ -1301,7 +1342,10 @@ def _run_refresh(token_shim, window_days, user_k):
         consolidated = total_prompts  # all clustered prompts are "consolidated"
         summary = res.setdefault("summary", {})
         overview = res.setdefault("overview", {})
-        overview["total_prompts"] = (overview.get("total_prompts") or 0) + len(candidates)
+        # Count only the NEWLY classified prompts — `candidates` is the full
+        # deduped union of all feeds (mostly already-counted baseline prompts),
+        # so adding len(candidates) double-counted and exploded the KPI.
+        overview["total_prompts"] = (overview.get("total_prompts") or 0) + len(new_cands)
         grand_total = max(overview["total_prompts"], total_prompts)
         summary["prompts_consolidated"] = consolidated
         if grand_total:

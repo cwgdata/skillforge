@@ -30,8 +30,11 @@ function pct(n) {
   return (Math.round(Number(n) * 10) / 10) + "%";
 }
 function esc(s) {
+  // Escape for both element and ATTRIBUTE contexts (quotes included) — values
+  // flow into `attr="${esc(...)}"` and several are LLM-generated skill names.
   return String(s == null ? "" : s)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 let RESULTS = null;
@@ -48,7 +51,7 @@ function showToast(msg, kind) {
   const t = $("#toast");
   if (!t) return;
   t.className = "toast" + (kind ? " " + kind : "");
-  t.innerHTML = msg;
+  t.textContent = msg;  // never render HTML — msg carries server/LLM-derived text
   t.classList.remove("hidden");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.add("hidden"), 6000);
@@ -331,7 +334,7 @@ async function refreshDone(st) {
     bits.push(`${fmt(asgTotal)} assigned`);
     let kind = "";
     if ((data.new_patterns || []).length) {
-      bits.push(`NEW PATTERN: ${esc(data.new_patterns.join(", "))}`);
+      bits.push(`NEW PATTERN: ${data.new_patterns.join(", ")}`);
       kind = "emerging";
     }
     showToast(bits.join(" — "), kind);
