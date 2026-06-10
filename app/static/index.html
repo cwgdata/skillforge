@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkillForge — Skill Recommendation Engine</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="%23ff3621" stroke-width="8"/><path d="M50 30 L50 70 M34 42 L66 58 M66 42 L34 58" stroke="%23ff3621" stroke-width="6" stroke-linecap="round"/></svg>' />
   <link rel="stylesheet" href="/app.css" />
@@ -26,14 +23,49 @@
         </div>
       </div>
       <nav class="side-nav" id="sideNav">
-        <a href="#sec-overview" class="nav-item active">Overview</a>
-        <a href="#sec-cost" class="nav-item">Cost &amp; ROI</a>
-        <a href="#sec-history" class="nav-item" id="navHistory" hidden>Mining Trend</a>
-        <a href="#sec-patterns" class="nav-item">Patterns</a>
-        <a href="#sec-skills" class="nav-item">Skills</a>
-        <a href="#sec-coverage" class="nav-item">Gateway Coverage</a>
-        <a href="#sec-inject" class="nav-item">Inject Prompts</a>
-        <a href="#sec-bench" class="nav-item">Test Bench</a>
+        <div class="nav-group">
+          <a href="#sec-overview" class="nav-item active" data-view="overview">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+            <span class="nav-lbl">Overview</span>
+          </a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-head">Insights</div>
+          <a href="#sec-patterns" class="nav-item" data-view="patterns">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg>
+            <span class="nav-lbl">Patterns</span>
+          </a>
+          <a href="#sec-cost" class="nav-item" data-view="cost">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 9.2c0-1.2-1.3-2-3-2s-3 .8-3 2 1.3 1.8 3 2 3 .9 3 2-1.3 2-3 2-3-.8-3-2"/></svg>
+            <span class="nav-lbl">Cost &amp; ROI</span>
+          </a>
+          <a href="#sec-history" class="nav-item" id="navHistory" data-view="history" hidden>
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+            <span class="nav-lbl">Mining Trend</span>
+          </a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-head">Skills</div>
+          <a href="#sec-skills" class="nav-item" data-view="skills">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 4 16 11l5 2-5 2-3 7-3-7-5-2 5-2 3-7Z"/></svg>
+            <span class="nav-lbl">Recommended Skills</span>
+          </a>
+          <a href="#sec-bench" class="nav-item" data-view="bench">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6.5L5.2 18A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-3L14 9.5V3"/><path d="M8 14h8"/></svg>
+            <span class="nav-lbl">Test Bench</span>
+          </a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-head">AI Gateway</div>
+          <a href="#sec-coverage" class="nav-item" data-view="coverage">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 7.5 8 9 4.8-1.5 8-4.5 8-9V6l-8-3Z"/></svg>
+            <span class="nav-lbl">Coverage</span>
+          </a>
+          <a href="#sec-inject" class="nav-item" data-view="inject">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+            <span class="nav-lbl">Inject Prompts</span>
+          </a>
+        </div>
       </nav>
       <div class="side-foot">FMAPI &middot; Unity Catalog &middot; AI Gateway</div>
     </aside>
@@ -103,137 +135,152 @@
     <!-- Main dashboard -->
     <div id="dashboard" class="hidden">
 
-      <!-- KPIs -->
-      <section class="section" id="sec-overview" style="margin-top:26px">
-        <div class="kpis" id="kpis"></div>
-      </section>
+      <!-- ===== Overview view (KPIs + Usage charts) ===== -->
+      <div class="view active" data-view="overview">
+        <section class="section" id="sec-overview">
+          <div class="kpis" id="kpis"></div>
+        </section>
 
-      <!-- Charts -->
-      <section class="section" id="sec-usage">
-        <h2>Usage Signal <span class="source-pill" id="usageSourcePill" hidden></span></h2>
-        <div class="charts">
-          <div class="card chart-card">
-            <h3>Prompts per day</h3>
-            <div class="chart-wrap"><canvas id="chartDay"></canvas></div>
-          </div>
-          <div class="card chart-card">
-            <h3>Tokens by endpoint</h3>
-            <div class="chart-wrap"><canvas id="chartEndpoint"></canvas></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Cost & ROI -->
-      <section class="section" id="sec-cost">
-        <h2>Cost &amp; ROI <span class="source-pill" id="costNote" hidden></span></h2>
-        <div class="cost-head">
-          <div class="cost-kpis" id="costKpis"></div>
-          <div class="cost-inputs">
-            <div class="price-ctl">
-              <label for="priceInput">$ / 1M input tokens</label>
-              <input id="priceInput" type="number" step="0.25" min="0" value="2.50" />
-              <span class="hint">illustrative — use your DBU rate</span>
+        <section class="section" id="sec-usage">
+          <h2>Usage Signal <span class="source-pill" id="usageSourcePill" hidden></span></h2>
+          <div class="charts">
+            <div class="card chart-card">
+              <h3>Prompts per day</h3>
+              <div class="chart-wrap"><canvas id="chartDay"></canvas></div>
             </div>
-            <div class="price-ctl">
-              <label for="scaleInput">× org projection</label>
-              <input id="scaleInput" type="number" step="1" min="1" value="1" />
-              <span class="hint">sample → full traffic</span>
+            <div class="card chart-card">
+              <h3>Tokens by endpoint</h3>
+              <div class="chart-wrap"><canvas id="chartEndpoint"></canvas></div>
             </div>
           </div>
-        </div>
-        <div class="card">
-          <table class="patterns">
-            <thead><tr><th>Skill</th><th>Priority</th><th>Monthly tokens</th><th>Monthly savings</th></tr></thead>
-            <tbody id="costRows"></tbody>
-          </table>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <!-- Mining history (scheduled auto-mine) -->
-      <section class="section" id="sec-history" hidden>
-        <h2>Mining Trend <span class="source-pill" id="historyNote" hidden></span></h2>
-        <p class="hint">Snapshots from the scheduled <code>skillforge-auto-mine</code> Job — patterns &amp; skills discovered over time.</p>
-        <div class="card"><div class="chart-wrap"><canvas id="chartHistory"></canvas></div></div>
-      </section>
-
-      <!-- Patterns -->
-      <section class="section" id="sec-patterns">
-        <h2>Discovered Patterns</h2>
-        <div class="card">
-          <table class="patterns">
-            <thead>
-              <tr>
-                <th>Pattern</th><th>Description</th>
-                <th class="num">Prompts</th><th class="num">Users</th>
-                <th class="num">Tokens</th><th>Purity</th>
-              </tr>
-            </thead>
-            <tbody id="patternRows"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Skills -->
-      <section class="section" id="sec-skills">
-        <h2>Recommended Skills</h2>
-        <div class="skill-grid" id="skillGrid"></div>
-      </section>
-
-      <!-- Gateway coverage -->
-      <section class="section" id="sec-coverage">
-        <h2>Gateway Coverage</h2>
-        <p class="hint" id="coverageBanner">Scanning serving endpoints…</p>
-        <div class="card">
-          <table class="patterns coverage">
-            <thead>
-              <tr><th>Endpoint</th><th>Type</th><th>State</th><th>Tokens (7d)</th><th>Inference table</th><th>Mine</th></tr>
-            </thead>
-            <tbody id="coverageRows"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Inject prompts -->
-      <section class="section" id="sec-inject">
-        <h2>Inject Prompts</h2>
-        <p class="hint">Fire prompts through the AI Gateway so they land in the real inference feed, and record them for re-classification.</p>
-        <div class="card bench">
-          <div>
-            <label for="injectText">Prompts</label>
-            <textarea id="injectText" placeholder="One prompt per line…"></textarea>
+      <!-- ===== Patterns view ===== -->
+      <div class="view" data-view="patterns">
+        <section class="section" id="sec-patterns">
+          <h2>Discovered Patterns</h2>
+          <div class="card">
+            <table class="patterns">
+              <thead>
+                <tr>
+                  <th>Pattern</th><th>Description</th>
+                  <th class="num">Prompts</th><th class="num">Users</th>
+                  <th class="num">Tokens</th><th>Purity</th>
+                </tr>
+              </thead>
+              <tbody id="patternRows"></tbody>
+            </table>
           </div>
-          <div>
-            <label for="injectEmail">Attribute to user email (optional)</label>
-            <input id="injectEmail" placeholder="alex@acme-corp.com" />
-          </div>
-          <div class="inject-actions">
-            <button class="btn" id="injectRun">Send</button>
-            <button class="btn ghost danger" id="injectClear" title="Delete all injected prompts">Clear prompt history</button>
-          </div>
-          <div id="injectError" class="error-banner hidden"></div>
-          <div id="injectOut"></div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <!-- Test bench -->
-      <section class="section" id="sec-bench">
-        <h2>Test Bench</h2>
-        <p class="hint">Fill a skill's parameters and run it live against the Foundation Model API. Optionally compare against your own raw prompt.</p>
-        <div class="card bench">
-          <div>
-            <label for="benchSkill">Skill</label>
-            <select id="benchSkill"></select>
+      <!-- ===== Cost & ROI view ===== -->
+      <div class="view" data-view="cost">
+        <section class="section" id="sec-cost">
+          <h2>Cost &amp; ROI <span class="source-pill" id="costNote" hidden></span></h2>
+          <div class="cost-head">
+            <div class="cost-kpis" id="costKpis"></div>
+            <div class="cost-inputs">
+              <div class="price-ctl">
+                <label for="priceInput">$ / 1M input tokens</label>
+                <input id="priceInput" type="number" step="0.25" min="0" value="2.50" />
+                <span class="hint">illustrative — use your DBU rate</span>
+              </div>
+              <div class="price-ctl">
+                <label for="scaleInput">× org projection</label>
+                <input id="scaleInput" type="number" step="1" min="1" value="1" />
+                <span class="hint">sample → full traffic</span>
+              </div>
+            </div>
           </div>
-          <div id="benchParams"></div>
-          <div>
-            <label for="benchRaw">Compare against your raw prompt (optional)</label>
-            <textarea id="benchRaw" placeholder="Paste the unstructured prompt you'd normally type..."></textarea>
+          <div class="card">
+            <table class="patterns">
+              <thead><tr><th>Skill</th><th>Priority</th><th>Monthly tokens</th><th>Monthly savings</th></tr></thead>
+              <tbody id="costRows"></tbody>
+            </table>
           </div>
-          <button class="btn" id="benchRun">Run skill</button>
-          <div id="benchError" class="error-banner hidden"></div>
-          <div id="benchOut"></div>
-        </div>
-      </section>
+        </section>
+      </div>
+
+      <!-- ===== Mining Trend view ===== -->
+      <div class="view" data-view="history">
+        <section class="section" id="sec-history" hidden>
+          <h2>Mining Trend <span class="source-pill" id="historyNote" hidden></span></h2>
+          <p class="hint">Snapshots from the scheduled <code>skillforge-auto-mine</code> Job — patterns &amp; skills discovered over time.</p>
+          <div class="card"><div class="chart-wrap"><canvas id="chartHistory"></canvas></div></div>
+        </section>
+      </div>
+
+      <!-- ===== Recommended Skills view ===== -->
+      <div class="view" data-view="skills">
+        <section class="section" id="sec-skills">
+          <h2>Recommended Skills</h2>
+          <div class="skill-grid" id="skillGrid"></div>
+        </section>
+      </div>
+
+      <!-- ===== Test Bench view ===== -->
+      <div class="view" data-view="bench">
+        <section class="section" id="sec-bench">
+          <h2>Test Bench</h2>
+          <p class="hint">Fill a skill's parameters and run it live against the Foundation Model API. Optionally compare against your own raw prompt.</p>
+          <div class="card bench">
+            <div>
+              <label for="benchSkill">Skill</label>
+              <select id="benchSkill"></select>
+            </div>
+            <div id="benchParams"></div>
+            <div>
+              <label for="benchRaw">Compare against your raw prompt (optional)</label>
+              <textarea id="benchRaw" placeholder="Paste the unstructured prompt you'd normally type..."></textarea>
+            </div>
+            <button class="btn" id="benchRun">Run skill</button>
+            <div id="benchError" class="error-banner hidden"></div>
+            <div id="benchOut"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Gateway Coverage view ===== -->
+      <div class="view" data-view="coverage">
+        <section class="section" id="sec-coverage">
+          <h2>Gateway Coverage</h2>
+          <p class="hint" id="coverageBanner">Scanning serving endpoints…</p>
+          <div class="card">
+            <table class="patterns coverage">
+              <thead>
+                <tr><th>Endpoint</th><th>Type</th><th>State</th><th>Tokens (7d)</th><th>Inference table</th><th>Mine</th></tr>
+              </thead>
+              <tbody id="coverageRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Inject Prompts view ===== -->
+      <div class="view" data-view="inject">
+        <section class="section" id="sec-inject">
+          <h2>Inject Prompts</h2>
+          <p class="hint">Fire prompts through the AI Gateway so they land in the real inference feed, and record them for re-classification.</p>
+          <div class="card bench">
+            <div>
+              <label for="injectText">Prompts</label>
+              <textarea id="injectText" placeholder="One prompt per line…"></textarea>
+            </div>
+            <div>
+              <label for="injectEmail">Attribute to user email (optional)</label>
+              <input id="injectEmail" placeholder="alex@acme-corp.com" />
+            </div>
+            <div class="inject-actions">
+              <button class="btn" id="injectRun">Send</button>
+              <button class="btn ghost danger" id="injectClear" title="Delete all injected prompts">Clear prompt history</button>
+            </div>
+            <div id="injectError" class="error-banner hidden"></div>
+            <div id="injectOut"></div>
+          </div>
+        </section>
+      </div>
 
     </div>
   </div>

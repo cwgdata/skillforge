@@ -680,11 +680,12 @@ async function loadHistory() {
   historyChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets: [
-      { label: "Patterns", data: runs.map((r) => r.patterns), borderColor: "#2272B4", backgroundColor: "rgba(34,114,180,0.10)", tension: 0.3 },
-      { label: "Skills", data: runs.map((r) => r.skills), borderColor: "#00A972", backgroundColor: "rgba(0,169,114,0.10)", tension: 0.3 },
+      { label: "Patterns", data: runs.map((r) => r.patterns), borderColor: "#5AA2E0", backgroundColor: "rgba(90,162,224,0.12)", tension: 0.3 },
+      { label: "Skills", data: runs.map((r) => r.skills), borderColor: "#4CD2A0", backgroundColor: "rgba(76,210,160,0.12)", tension: 0.3 },
     ]},
-    options: { plugins: { legend: { labels: { color: "#5A6872" } } },
-      scales: { x: { grid: { color: "rgba(17,23,28,0.06)" }, ticks: { color: "#5A6872" } }, y: { grid: { color: "rgba(17,23,28,0.06)" }, ticks: { color: "#5A6872" }, beginAtZero: true } } },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "#9AA7B0" } } },
+      scales: { x: { grid: { color: "rgba(255,255,255,0.08)" }, ticks: { color: "#9AA7B0" } }, y: { grid: { color: "rgba(255,255,255,0.08)" }, ticks: { color: "#9AA7B0" }, beginAtZero: true } } },
   });
 }
 
@@ -809,8 +810,8 @@ async function reloadCharts() {
   if (CHART_DAY) { CHART_DAY.destroy(); CHART_DAY = null; }
   if (CHART_EP) { CHART_EP.destroy(); CHART_EP = null; }
 
-  const gridColor = "rgba(17,23,28,0.06)";
-  const tickColor = "#5A6872";
+  const gridColor = "rgba(255,255,255,0.08)";
+  const tickColor = "#9AA7B0";
 
   // prompts per day — line
   const days = stats.prompts_per_day || [];
@@ -820,8 +821,8 @@ async function reloadCharts() {
       labels: days.map((d) => d.date),
       datasets: [{
         data: days.map((d) => d.count),
-        borderColor: "#2272B4",
-        backgroundColor: "rgba(34,114,180,0.10)",
+        borderColor: "#5AA2E0",
+        backgroundColor: "rgba(90,162,224,0.14)",
         fill: true,
         tension: 0.35,
         pointRadius: 0,
@@ -840,7 +841,7 @@ async function reloadCharts() {
 
   // tokens by endpoint — doughnut
   const eps = stats.tokens_by_endpoint || [];
-  const palette = ["#2272B4", "#00A972", "#DE7C00", "#7C6BD6", "#FF3621", "#4AA3DF", "#8C99A3"];
+  const palette = ["#5AA2E0", "#4CD2A0", "#9B8BE6", "#E8A04D", "#FF6F5E", "#6FB8EA", "#8C99A3"];
   CHART_EP = new Chart($("#chartEndpoint"), {
     type: "doughnut",
     data: {
@@ -848,7 +849,7 @@ async function reloadCharts() {
       datasets: [{
         data: eps.map((e) => e.tokens),
         backgroundColor: palette,
-        borderColor: "#FFFFFF",
+        borderColor: "#1F272D",
         borderWidth: 2,
       }],
     },
@@ -1044,7 +1045,62 @@ async function runInject() {
 init();
 
 
-// ---- sidebar nav (scrollspy + smooth scroll) ----
+// ---- sidebar nav (separate-view router) ----
+// Each nav item maps to a top-level .view container (data-view). Clicking shows
+// ONLY that view (display:none on the rest), marks the item active, and sets
+// location.hash. Overview shows both the KPI band (#sec-overview) and the Usage
+// charts (#sec-usage), which live inside the same data-view="overview" wrapper.
+//
+// Chart.js canvases created while their .view is display:none size to 0, so we
+// must .resize() the charts whose view just became visible (Usage line+doughnut
+// on Overview, and the Mining Trend chart on History).
+const VIEW_HREF = {
+  "sec-overview": "overview",
+  "sec-usage": "overview",
+  "sec-patterns": "patterns",
+  "sec-cost": "cost",
+  "sec-history": "history",
+  "sec-skills": "skills",
+  "sec-bench": "bench",
+  "sec-coverage": "coverage",
+  "sec-inject": "inject",
+};
+
+function resizeViewCharts(view) {
+  // Defer to next frame so layout reflows after the view becomes visible.
+  requestAnimationFrame(() => {
+    if (view === "overview") {
+      if (typeof CHART_DAY !== "undefined" && CHART_DAY) CHART_DAY.resize();
+      if (typeof CHART_EP !== "undefined" && CHART_EP) CHART_EP.resize();
+    } else if (view === "history") {
+      if (typeof historyChart !== "undefined" && historyChart) historyChart.resize();
+    }
+  });
+}
+
+function showView(view, opts) {
+  opts = opts || {};
+  const views = Array.from(document.querySelectorAll(".view[data-view]"));
+  const valid = views.some((v) => v.dataset.view === view);
+  if (!valid) view = "overview";
+  views.forEach((v) => v.classList.toggle("active", v.dataset.view === view));
+  const items = Array.from(document.querySelectorAll("#sideNav .nav-item"));
+  items.forEach((it) => it.classList.toggle("active", it.dataset.view === view));
+  if (opts.setHash !== false) {
+    const sec = "sec-" + view;
+    if (location.hash !== "#" + sec) {
+      history.replaceState(null, "", "#" + sec);
+    }
+  }
+  resizeViewCharts(view);
+}
+
+function viewFromHash() {
+  const h = (location.hash || "").replace(/^#/, "");
+  if (h && VIEW_HREF[h]) return VIEW_HREF[h];
+  return null;
+}
+
 function wireSidebar() {
   const nav = document.getElementById("sideNav");
   if (!nav || nav.dataset.wired) return;
@@ -1052,27 +1108,17 @@ function wireSidebar() {
   const items = Array.from(nav.querySelectorAll(".nav-item"));
   items.forEach((it) => {
     it.addEventListener("click", (e) => {
-      const target = document.querySelector(it.getAttribute("href"));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      e.preventDefault();
+      const view = it.dataset.view || VIEW_HREF[(it.getAttribute("href") || "").replace(/^#/, "")];
+      if (view) showView(view);
     });
   });
-  // Overview nav stays active across both the KPI and usage sections.
-  const map = { "sec-usage": "#sec-overview" };
-  const obs = new IntersectionObserver(
-    (entries) => {
-      const vis = entries.filter((en) => en.isIntersecting)
-        .sort((x, y) => y.intersectionRatio - x.intersectionRatio)[0];
-      if (!vis) return;
-      const id = vis.target.id;
-      const href = map[id] || "#" + id;
-      items.forEach((it) => it.classList.toggle("active", it.getAttribute("href") === href));
-    },
-    { rootMargin: "-20% 0px -55% 0px", threshold: [0.05, 0.25, 0.5] }
-  );
-  document.querySelectorAll("section.section[id]").forEach((s) => obs.observe(s));
+  window.addEventListener("hashchange", () => {
+    const v = viewFromHash();
+    if (v) showView(v, { setHash: false });
+  });
+  // initial route: hash if valid, else Overview
+  showView(viewFromHash() || "overview", { setHash: false });
 }
 document.addEventListener("DOMContentLoaded", wireSidebar);
 

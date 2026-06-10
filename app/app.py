@@ -618,8 +618,30 @@ def whoami(request: Request):
     return {"email": email, "auth_mode": "local", "personal_view": bool(personal)}
 
 
-def _usage_stats_snapshot(window_days, source="snapshot"):
-    """Compute usage stats from the gateway_usage.json snapshot."""
+def _real_tokens_by_endpoint(window_days, request):
+    """REAL per-endpoint token volume from system.ai_gateway.usage for THIS
+    workspace (the synthetic corpus's endpoint column is random noise). Returns
+    [{endpoint, tokens}] or [] if the system table is unreadable."""
+    ws_id = AI_GATEWAY_URL.split("//")[-1].split(".")[0] if AI_GATEWAY_URL else ""
+    if not ws_id.isdigit():
+        return []
+    days = int(window_days) if window_days and window_days > 0 else 30
+    try:
+        rows = run_sql(
+            "SELECT endpoint_name, SUM(total_tokens) AS t FROM system.ai_gateway.usage "
+            f"WHERE workspace_id = '{ws_id}' AND event_time > now() - INTERVAL {days} DAYS "
+            "GROUP BY endpoint_name HAVING t > 0 ORDER BY t DESC",
+            request=request,
+        )
+        return [{"endpoint": r[0] or "unknown", "tokens": int(r[1] or 0)} for r in rows]
+    except Exception:  # noqa: BLE001 — system table unreadable for this principal
+        return []
+
+
+def _usage_stats_snapshot(window_days, source="snapshot", request=None):
+    """Compute usage stats from the gateway_usage.json snapshot. Tokens-by-
+    endpoint is sourced from REAL gateway usage where available (the snapshot's
+    endpoint tags are synthetic)."""
     rows = filter_window(load_usage(), window_days)
     per_day = Counter()
     per_user = Counter()
@@ -633,14 +655,17 @@ def _usage_stats_snapshot(window_days, source="snapshot"):
         tok = (r.get("input_tokens") or 0) + (r.get("output_tokens") or 0)
         tokens_per_endpoint[r.get("endpoint_name", "unknown")] += tok
 
+    real_tokens = _real_tokens_by_endpoint(window_days, request) if request is not None else []
+    tokens_by_endpoint = real_tokens or [
+        {"endpoint": e, "tokens": t}
+        for e, t in sorted(tokens_per_endpoint.items(), key=lambda kv: kv[1], reverse=True)
+    ]
     return {
         "source": source,
         "prompts_per_day": [{"date": d, "count": c} for d, c in sorted(per_day.items())],
         "prompts_per_user": [{"user": u, "count": c} for u, c in per_user.most_common(10)],
-        "tokens_by_endpoint": [
-            {"endpoint": e, "tokens": t}
-            for e, t in sorted(tokens_per_endpoint.items(), key=lambda kv: kv[1], reverse=True)
-        ],
+        "tokens_by_endpoint": tokens_by_endpoint,
+        "tokens_source": "gateway_usage_system_table" if real_tokens else "synthetic_snapshot",
         "total_rows": len(rows),
         "window_days": window_days,
     }
@@ -675,14 +700,19 @@ def _usage_stats_uc(window_days, request):
         f"GROUP BY user_email ORDER BY c DESC LIMIT 10",
         request=request,
     )
-    tok_rows = run_sql(
-        f"SELECT endpoint_name, "
-        f"SUM(COALESCE(input_tokens,0) + COALESCE(output_tokens,0)) AS t "
-        f"FROM {USAGE_TABLE} {where} GROUP BY endpoint_name ORDER BY t DESC",
-        request=request,
-    )
     total_rows = run_sql(f"SELECT COUNT(*) FROM {USAGE_TABLE} {where}", request=request)
     total = int(total_rows[0][0]) if total_rows and total_rows[0] else 0
+
+    # Tokens-by-endpoint comes from REAL gateway usage (the corpus endpoint
+    # column is synthetic); fall back to the corpus sum only if unreadable.
+    real_tokens = _real_tokens_by_endpoint(window_days, request)
+    if not real_tokens:
+        tok_rows = run_sql(
+            f"SELECT endpoint_name, SUM(COALESCE(input_tokens,0)+COALESCE(output_tokens,0)) AS t "
+            f"FROM {USAGE_TABLE} {where} GROUP BY endpoint_name ORDER BY t DESC",
+            request=request,
+        )
+        real_tokens = [{"endpoint": r[0] or "unknown", "tokens": int(r[1] or 0)} for r in tok_rows]
 
     return {
         "source": "uc",
@@ -692,9 +722,8 @@ def _usage_stats_uc(window_days, request):
         "prompts_per_user": [
             {"user": r[0] or "unknown", "count": int(r[1] or 0)} for r in per_user_rows
         ],
-        "tokens_by_endpoint": [
-            {"endpoint": r[0] or "unknown", "tokens": int(r[1] or 0)} for r in tok_rows
-        ],
+        "tokens_by_endpoint": real_tokens,
+        "tokens_source": "gateway_usage_system_table",
         "total_rows": total,
         "window_days": window_days,
     }
@@ -703,7 +732,7 @@ def _usage_stats_uc(window_days, request):
 @app.get("/api/usage/stats")
 def usage_stats(request: Request, window_days: int = 0, source: str = "snapshot"):
     if source != "uc":
-        return _usage_stats_snapshot(window_days)
+        return _usage_stats_snapshot(window_days, request=request)
 
     now = time.time()
     cached = _UC_STATS_CACHE.get(window_days)
@@ -714,7 +743,7 @@ def usage_stats(request: Request, window_days: int = 0, source: str = "snapshot"
         _UC_STATS_CACHE[window_days] = {"ts": now, "data": data}
         return data
     except Exception:  # noqa: BLE001 — fall back to the snapshot computation
-        return _usage_stats_snapshot(window_days, source="snapshot_fallback")
+        return _usage_stats_snapshot(window_days, source="snapshot_fallback", request=request)
 
 
 # --------------------------------------------------------------------------- #
