@@ -149,7 +149,7 @@
               <div class="chart-wrap"><canvas id="chartDay"></canvas></div>
             </div>
             <div class="card chart-card">
-              <h3>Tokens by endpoint</h3>
+              <h3>Tokens by endpoint <span class="source-pill warn" id="epSourcePill" hidden></span></h3>
               <div class="chart-wrap"><canvas id="chartEndpoint"></canvas></div>
             </div>
           </div>
@@ -267,6 +267,11 @@
             <div>
               <label for="injectText">Prompts</label>
               <textarea id="injectText" placeholder="One prompt per line…"></textarea>
+            </div>
+            <div>
+              <label for="injectEndpoint">Endpoint</label>
+              <select id="injectEndpoint"><option value="databricks-claude-haiku-4-5" selected>databricks-claude-haiku-4-5</option></select>
+              <span class="hint">prompts land in this endpoint's inference feed (if payload logging is on)</span>
             </div>
             <div>
               <label for="injectEmail">Attribute to user email (optional)</label>

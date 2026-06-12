@@ -794,6 +794,7 @@ def test_skill(req: TestSkillRequest, request: Request):
 class InjectRequest(BaseModel):
     prompts: list[str]
     user_email: str | None = None
+    endpoint: str | None = None  # FMAPI endpoint to route through (default haiku)
 
 
 @app.post("/api/inject")
@@ -805,12 +806,22 @@ def inject(req: InjectRequest, request: Request):
     ident = request_identity(request)
     email = req.user_email or ident.get("email") or "injected@skillforge"
 
+    # Endpoint selection: validate against real serving endpoints so the value
+    # can't be an arbitrary string fed to the gateway.
+    model = FMAPI_HAIKU
+    if req.endpoint:
+        payload = endpoints_scan(request)
+        known = {e["name"] for e in payload.get("endpoints", [])} if isinstance(payload, dict) else set()
+        if req.endpoint not in known:
+            return JSONResponse({"error": f"Unknown endpoint '{req.endpoint}'."}, status_code=400)
+        model = req.endpoint
+
     sent, failed, errors = 0, 0, []
     inserted = 0
     for p in prompts:
         # (a) Fire through the AI Gateway so it lands in the REAL inference table.
         try:
-            call_fmapi(p, request=request, model=FMAPI_HAIKU, max_tokens=16)
+            call_fmapi(p, request=request, model=model, max_tokens=16)
             sent += 1
         except Exception as exc:  # noqa: BLE001
             failed += 1

@@ -827,3 +827,5 @@ pre.code {
   .identity-chip .id-email { max-width: 120px; }
   .cost-head { flex-direction: column; }
 }
+
+.source-pill.warn { background: rgba(232,160,77,0.15); color: #E8A04D; }

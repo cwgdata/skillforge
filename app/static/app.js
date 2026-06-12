@@ -224,6 +224,20 @@ async function loadCoverage() {
   $("#coverageBanner").innerHTML =
     `<b>${fmt(data.configured)}</b> of <b>${fmt(data.total)}</b> endpoints have inference tables — ` +
     `<b>${fmt(mined)}</b> feed${mined === 1 ? "" : "s"} enabled for mining.`;
+  // populate the Inject endpoint selector (configured feeds first)
+  const injSel = $("#injectEndpoint");
+  if (injSel) {
+    const cur = injSel.value;
+    const sorted = [...eps].sort((x, y) => (!!y.inference_table - !!x.inference_table) || String(x.name).localeCompare(String(y.name)));
+    injSel.innerHTML = "";
+    sorted.forEach((e) => {
+      const o = document.createElement("option");
+      o.value = e.name;
+      o.textContent = e.name + (e.inference_table ? "  ● feed" : "");
+      injSel.appendChild(o);
+    });
+    injSel.value = sorted.some((e) => e.name === cur) ? cur : (sorted[0] ? sorted[0].name : "");
+  }
   const tb = $("#coverageRows");
   tb.innerHTML = "";
   eps.forEach((e) => {
@@ -840,6 +854,16 @@ async function reloadCharts() {
 
   // tokens by endpoint — doughnut
   const eps = stats.tokens_by_endpoint || [];
+  const epPill = $("#epSourcePill");
+  if (epPill) {
+    const real = stats.tokens_source === "gateway_usage_system_table";
+    epPill.hidden = false;
+    epPill.textContent = real ? "LIVE GATEWAY" : "SYNTHETIC SAMPLE";
+    epPill.className = "source-pill " + (real ? "" : "warn");
+    epPill.title = real
+      ? "Real per-endpoint tokens from system.ai_gateway.usage (this workspace)"
+      : "No gateway traffic recorded for this workspace yet — showing the synthetic sample split";
+  }
   const palette = ["#5AA2E0", "#4CD2A0", "#9B8BE6", "#E8A04D", "#FF6F5E", "#6FB8EA", "#8C99A3"];
   CHART_EP = new Chart($("#chartEndpoint"), {
     type: "doughnut",
@@ -1017,7 +1041,7 @@ async function runInject() {
     const resp = await fetch("/api/inject", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompts, user_email: userEmail }),
+      body: JSON.stringify({ prompts, user_email: userEmail, endpoint: ($("#injectEndpoint") || {}).value || null }),
     });
     const data = await resp.json();
     if (!resp.ok || data.error) throw new Error(data.error || "HTTP " + resp.status);
