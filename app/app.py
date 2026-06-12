@@ -979,6 +979,11 @@ def endpoints_scan(request: Request):
     # its table prefix matches an endpoint name, attribute it directly.
     cfg_tbl = INFERENCE_TABLE.replace("`", "")
     cfg_ep = cfg_tbl.rsplit(".", 1)[-1].removesuffix("_payload") if cfg_tbl else ""
+    # The UI suffixes the prefix when the default name is taken (e.g.
+    # databricks-claude-haiku-4-5-b) — strip a short trailing -x token so the
+    # bridge still attributes the table to its endpoint.
+    import re as _re
+    cfg_ep = _re.sub(r"-[a-z0-9]{1,2}$", "", cfg_ep)
     for ep in out:
         info = v2.get(ep["name"]) or {}
         ep["tokens_7d"] = info.get("tokens") or 0
